@@ -40,6 +40,13 @@ def lanzar_dados(partida_id: int):
         partida.puntajes[jugador.nombre] += puntos
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": partida.puntajes}
 
+@app.get("/partidas/{partida_id}/estadisticas")
+def obtener_estadisticas(partida_id: int):
+    partida = next((p for p in partidas if p.id == partida_id), None)
+    if not partida:
+        raise HTTPException(status_code=404, detail="Partida no encontrada")
+    return {"partida_id": partida.id, "puntajes": partida.puntajes}
+
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido al Juego de Dados"}

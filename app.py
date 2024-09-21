@@ -3,10 +3,17 @@ from fastapi import FastAPI, HTTPException
 from typing import List
 import random
 app = FastAPI()
+
 jugadores_registrados = []
+partidas = []
 
 class Jugador(BaseModel):
     nombre: str
+
+class Partida(BaseModel):
+    id: int
+    jugadores: List[Jugador]
+    puntajes: dict
 
 @app.post("/jugadores/")
 def registrar_jugador(jugador: Jugador):
@@ -14,13 +21,6 @@ def registrar_jugador(jugador: Jugador):
         raise HTTPException(status_code=400, detail="El jugador ya está registrado")
     jugadores_registrados.append(jugador)
     return {"mensaje": f"Jugador {jugador.nombre} registrado con éxito"}
-
-class Partida(BaseModel):
-    id: int
-    jugadores: List[Jugador]
-    puntajes: dict
-
-partidas = []
 
 @app.post("/partidas/")
 def crear_partida(jugadores: List[Jugador]):
@@ -39,7 +39,6 @@ def lanzar_dados(partida_id: int):
         puntos = random.randint(1, 6)
         partida.puntajes[jugador.nombre] += puntos
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": partida.puntajes}
-
 
 @app.get("/")
 def read_root():

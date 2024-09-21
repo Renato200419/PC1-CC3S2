@@ -1,0 +1,12 @@
+version: '3.8'  # Usa la versión 3.8 de Docker Compose
+
+services:
+  app:  # Nombre del servicio
+    build: .  # Construye la imagen a partir del Dockerfile en el directorio actual
+    ports:
+      - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 del host
+    environment:
+      - ENVIRONMENT=production  # Define una variable de entorno
+    volumes:
+      - .:/app  # Monta el directorio actual en '/app' dentro del contenedor
+    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para ejecutar la aplicación

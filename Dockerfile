@@ -1,8 +1,8 @@
 # Usamos la imagen base de Python 3.8
 FROM python:3.8
 
-# Copiamos el contenido del directorio 'app' en el contenedor en la ruta '/app'
-COPY ./app /app
+# Copiamos todos los archivos del directorio actual al contenedor en la ruta '/app'
+COPY . /app
 
 # Establecemos el directorio de trabajo en '/app'
 WORKDIR /app

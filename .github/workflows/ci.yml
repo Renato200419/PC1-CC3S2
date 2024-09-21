@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - fix/ci-pipeline
   pull_request:
     branches:
       - main
-      - fix/ci-pipeline
 
 jobs:
   build:

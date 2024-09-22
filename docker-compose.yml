@@ -1,12 +1,34 @@
-version: '3.8'  # Usa la versión 3.8 de Docker Compose
+version: '3.8'
 
 services:
-  app:  # Nombre del servicio
-    build: .  # Construye la imagen a partir del Dockerfile en el directorio actual
+  app:
+    build: .  # Construye la imagen desde el Dockerfile en el directorio actual
     ports:
       - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 del host
     environment:
-      - ENVIRONMENT=production  # Define una variable de entorno
+      - ENVIRONMENT=production  # Establece la variable de entorno para indicar que es producción
     volumes:
-      - .:/app  # Monta el directorio actual en '/app' dentro del contenedor
-    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para ejecutar la aplicación
+      - .:/app  # Monta el directorio actual en /app dentro del contenedor
+    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para iniciar la aplicación usando Uvicorn
+
+  prometheus:
+    image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
+    ports:
+      - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
+    depends_on:
+      - app  # Asegura que el servicio 'app' esté en ejecución antes de iniciar Prometheus
+
+  grafana:
+    image: grafana/grafana  # Utiliza la imagen oficial de Grafana
+    ports:
+      - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
+    depends_on:
+      - prometheus  # Asegura que Prometheus esté en ejecución antes de iniciar Grafana
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false  # Desactiva el registro de nuevos usuarios
+
+volumes:
+  grafana_data:
+    driver: local  # Define un volumen local para almacenar datos de Grafana

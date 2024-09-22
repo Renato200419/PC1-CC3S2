@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from typing import List
 import random
+import uvicorn
 app = FastAPI()
 
 jugadores_registrados = []
@@ -50,3 +51,6 @@ def obtener_estadisticas(partida_id: int):
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido al Juego de Dados"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

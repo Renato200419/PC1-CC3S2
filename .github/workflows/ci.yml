@@ -1,9 +1,10 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+      - feature/actualizar-ci
   pull_request:
     branches:
       - main
@@ -19,13 +20,25 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version:
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      #- name: Run tests
-        #run: |
-          #pytest  # Asegúrate de tener pytest en tus dependencias
+     - name: Run tests
+        run: |
+          pytest tests/
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Audit dependencies
+        run: pip-audit
+
+      - name: Build Docker image
+        run: docker build -t juego-dados-competitivo .
+
+      - name: Run Docker container
+        run: docker run -d -p 8000:8000 juego-dados-competitivo

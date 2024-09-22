@@ -1,11 +1,17 @@
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
+from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Counter, Histogram
 from typing import List
 import random
 import uvicorn
+
 app = FastAPI()
 
+instrumentator = Instrumentator()
+
 jugadores_registrados = []
+
 partidas = []
 
 class Jugador(BaseModel):

@@ -1,17 +1,11 @@
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
-from prometheus_fastapi_instrumentator import Instrumentator
-from prometheus_client import Counter, Histogram
 from typing import List
 import random
 import uvicorn
-
 app = FastAPI()
 
-instrumentator = Instrumentator()
-
 jugadores_registrados = []
-
 partidas = []
 
 class Jugador(BaseModel):
@@ -21,11 +15,6 @@ class Partida(BaseModel):
     id: int
     jugadores: List[Jugador]
     puntajes: dict
-
-# Métricas
-tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
-latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
-
 
 @app.post("/jugadores/")
 def registrar_jugador(jugador: Jugador):
@@ -43,9 +32,7 @@ def crear_partida(jugadores: List[Jugador]):
     return {"mensaje": f"Partida {nueva_partida.id} creada con éxito", "partida": nueva_partida}
 
 @app.post("/partidas/{partida_id}/lanzar")
-@latencia_histogram.time() # Medir latencia
 def lanzar_dados(partida_id: int):
-    tiradas_counter.inc() # Incrementar el contador de tiradas
     partida = next((p for p in partidas if p.id == partida_id), None)
     if not partida:
         raise HTTPException(status_code=404, detail="Partida no encontrada")
@@ -64,9 +51,6 @@ def obtener_estadisticas(partida_id: int):
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido al Juego de Dados"}
-
-instrumentator.instrument(app).expose(app)
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

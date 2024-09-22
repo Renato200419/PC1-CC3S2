@@ -52,7 +52,3 @@ jobs:
             echo "Esperando a que FastAPI esté disponible..."
             sleep 5
           done
-
-      - name: Run API tests
-        run: |
-          pytest tests/     

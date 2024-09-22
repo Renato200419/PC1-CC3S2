@@ -1,6 +1,10 @@
-fastapi
-uvicorn
-pydantic
+fastapi~=0.115.0
+uvicorn~=0.22.0
+pydantic~=2.9.2
 pip-audit
 pytest
 httpx
+
+prometheus_client~=0.21.0
+prometheus-fastapi-instrumentator
+requests~=2.32.3

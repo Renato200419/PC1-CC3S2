@@ -25,6 +25,7 @@ class Partida(BaseModel):
 # Métricas
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
+puntuaciones_altas = Histogram ( "puntuaciones_altas", "Puntuaciones altas en la API")
 
 
 @app.post("/jugadores/")
@@ -52,6 +53,9 @@ def lanzar_dados(partida_id: int):
     for jugador in partida.jugadores:
         puntos = random.randint(1, 6)
         partida.puntajes[jugador.nombre] += puntos
+        if puntos >= 4:
+            puntuaciones_altas.observe(puntos)
+
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": partida.puntajes}
 
 @app.get("/partidas/{partida_id}/estadisticas")

@@ -15,6 +15,7 @@ services:
     image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
+      - prometheus_data:/prometheus  # Almacena datos de series temporales aquí
     ports:
       - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
     depends_on:
@@ -22,6 +23,8 @@ services:
 
   grafana:
     image: grafana/grafana  # Utiliza la imagen oficial de Grafana
+    volumes:
+      - grafana_data:/var/lib/grafana  # Persiste datos de Grafana aquí
     ports:
       - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
     depends_on:
@@ -32,3 +35,5 @@ services:
 volumes:
   grafana_data:
     driver: local  # Define un volumen local para almacenar datos de Grafana
+  prometheus_data:
+    driver: local  # Define un volumen local para almacenar datos de Prometheus

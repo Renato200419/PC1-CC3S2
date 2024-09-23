@@ -102,3 +102,36 @@ En ocasiones, dos o más desarrolladores pueden trabajar en partes similares del
 13. Finalmente el colaborador A acepta el PR y se realizaría la fusión con éxito
 ![Descripción de la imagen](Imagenes-git/Foto21.png)
 ![Descripción de la imagen](Imagenes-git/Foto22.png)
+
+## Uso de cherry-pick
+La situación que enfrentamos para utilizar cherry-pick fue la siguiente:
+
+Se creó la rama `feature/metrics` para configurar las métricas de Prometheus, en un momento se vió que era necesario actualizar la forma en la que el Dockerfile instalaba las dependencias, por lo que se creó una rama más a partir de `feature/metrics` llamada `feature/metrics-docker-update`.
+
+Al terminar los cambios en `feature/metrics-docker-update`, se procedió a crear la PR y fusionar.
+
+![[PR17.png]](Imagenes-git/PR17.png)
+
+Aquí tuvimos un error pues la PR solicitaba fusionar `feature/metrics-docker-update` con `main` y al darnos cuenta creamos otra PR haciendo la fusión correcta de `feature/metrics-docker-update` a `feature/metrics` y posterior a ello se fusiona `feature/metrics` con `main`.
+
+![[PR18.png]](Imagenes-git/PR18.png)
+
+![[PR19.png]](Imagenes-git/PR19.png)
+
+Luego de estos PR se procede a revertir el merge de `feature/metrics-docker-update` con `main`. El error se da aquí, pues revertir la PR 17 (la del merge erróneo) luego de aceptar la PR-18 y PR-19 elimina cambios que ya no se incluyen en las últimas PR porque se supone que fueron incluidos antes.
+
+Ahora tenemos la rama main sin varios commits relevantes, una solución rápida que se nos ocurrió es utilizar `cherry-pick` para traer esos cambios a `main`. A continuación la PR que resuelve el problema:
+
+![[PR20.png]](Imagenes-git/PR20.png)
+
+El integrante Olivera se da cuenta de un problema con nuestro Pipeline tras traer estos commits:
+
+![[Problema.png]](Imagenes-git/Problema.png)
+
+El integrante Barriga lee el comentario y tras analizar la causa de que la API no responda, se da cuenta que falta hacer un `cherry-pick` a un commit más. Se hace los cambios y se aprueba la PR ahora que sí funciona.
+
+![[solucion.png]](Imagenes-git/solucion.png)
+
+Con esto nuestro gráfico de las ramas se ve así:
+
+![[branches.png]](Imagenes-git/branches.png)

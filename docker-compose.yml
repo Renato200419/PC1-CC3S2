@@ -1,39 +1,61 @@
 version: '3.8'
 
 services:
+  # Servicio de la aplicación FastAPI
   app:
     build: .  # Construye la imagen desde el Dockerfile en el directorio actual
     ports:
       - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 del host
     environment:
-      - ENVIRONMENT=production  # Establece la variable de entorno para indicar que es producción
+      - ENVIRONMENT=production  # Variable de entorno para indicar el entorno
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres  # URL de conexión a PostgreSQL
     volumes:
       - .:/app  # Monta el directorio actual en /app dentro del contenedor
-    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para iniciar la aplicación usando Uvicorn
+    depends_on:
+      - db  # Asegura que la base de datos esté lista antes de iniciar la aplicación
+    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para iniciar la aplicación con Uvicorn
 
+  # Servicio de base de datos PostgreSQL
+  db:
+    image: postgres:13  # Utiliza la imagen oficial de PostgreSQL
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres  # Nombre de la base de datos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Volumen para almacenar los datos de PostgreSQL
+    ports:
+      - "5432:5432"  # Mapea el puerto 5432 del contenedor al puerto 5432 del host (si es necesario)
+
+  # Servicio de Prometheus
   prometheus:
     image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
-      - prometheus_data:/prometheus  # Almacena datos de series temporales aquí
+      - prometheus_data:/prometheus  # Almacena los datos de series temporales
     ports:
       - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
     depends_on:
       - app  # Asegura que el servicio 'app' esté en ejecución antes de iniciar Prometheus
 
+  # Servicio de Grafana
   grafana:
     image: grafana/grafana  # Utiliza la imagen oficial de Grafana
     volumes:
-      - grafana_data:/var/lib/grafana  # Persiste datos de Grafana aquí
+      - grafana_data:/var/lib/grafana  # Persiste los datos de Grafana
     ports:
       - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
     depends_on:
       - prometheus  # Asegura que Prometheus esté en ejecución antes de iniciar Grafana
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false  # Desactiva el registro de nuevos usuarios
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Contraseña predeterminada de administrador (cámbiala)
 
+# Definición de volúmenes persistentes para almacenar datos
 volumes:
+  postgres_data:
+    driver: local  # Volumen local para datos de PostgreSQL
   grafana_data:
-    driver: local  # Define un volumen local para almacenar datos de Grafana
+    driver: local  # Volumen local para datos de Grafana
   prometheus_data:
-    driver: local  # Define un volumen local para almacenar datos de Prometheus
+    driver: local  # Volumen local para datos de Prometheus

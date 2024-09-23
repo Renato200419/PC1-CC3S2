@@ -23,6 +23,9 @@ class Partida(BaseModel):
     puntajes: dict
 
 # Métricas
+# 1. Contador de jugadores registrados
+jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores registrados")  # Punto 1
+
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
 
@@ -32,6 +35,7 @@ def registrar_jugador(jugador: Jugador):
     if jugador.nombre in [j.nombre for j in jugadores_registrados]:
         raise HTTPException(status_code=400, detail="El jugador ya está registrado")
     jugadores_registrados.append(jugador)
+    jugadores_counter.inc()  # Punto 1: Incrementar el contador de jugadores registrados
     return {"mensaje": f"Jugador {jugador.nombre} registrado con éxito"}
 
 @app.post("/partidas/")

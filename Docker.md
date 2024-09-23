@@ -207,7 +207,7 @@ volumes:
     driver: local
  ```
 ## Finalización con `pull request` y la aceptación del `merge`
-1. Al subir los cambios en la rama, se hace un `Create and compare pull request`
+1. Al subir los cambios en la rama, se hace un `Compare & pull request`
 2. Se añade un título y una descripción breve.
 3. Luego se agrega un comentario avisando que estás esperando la aceptación de los cambios. [optional]
 4. Uno de los colaboradores acepta nuestros cambios.

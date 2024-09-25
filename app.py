@@ -23,8 +23,14 @@ class Partida(BaseModel):
     puntajes: dict
 
 # Métricas
+
+# 1. Contador de jugadores registrados
+jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores registrados") # Punto 1
+#Contador de partidas creadas
+partidas_counter= Counter("partidas_creadas_totales","Total de partidas creadas")
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
+puntajes_histogram = Histogram("puntajes_altos", "Distribución de puntuaciones altas", buckets=[10, 20, 30, 40, 50, 60])
 
 
 @app.post("/jugadores/")
@@ -32,6 +38,8 @@ def registrar_jugador(jugador: Jugador):
     if jugador.nombre in [j.nombre for j in jugadores_registrados]:
         raise HTTPException(status_code=400, detail="El jugador ya está registrado")
     jugadores_registrados.append(jugador)
+    jugadores_counter.inc() # Punto 1: Incrementar el contador de jugadores registrados
+
     return {"mensaje": f"Jugador {jugador.nombre} registrado con éxito"}
 
 @app.post("/partidas/")
@@ -40,6 +48,8 @@ def crear_partida(jugadores: List[Jugador]):
         raise HTTPException(status_code=400, detail="Se requieren al menos 2 jugadores")
     nueva_partida = Partida(id=len(partidas) + 1, jugadores=jugadores, puntajes={jugador.nombre: 0 for jugador in jugadores})
     partidas.append(nueva_partida)
+    
+    partidas_counter.inc()
     return {"mensaje": f"Partida {nueva_partida.id} creada con éxito", "partida": nueva_partida}
 
 @app.post("/partidas/{partida_id}/lanzar")
@@ -52,6 +62,10 @@ def lanzar_dados(partida_id: int):
     for jugador in partida.jugadores:
         puntos = random.randint(1, 6)
         partida.puntajes[jugador.nombre] += puntos
+        ## Agregar métrica de puntuaciones altas para puntos mayores a 4
+        if puntos > 4:
+            puntajes_histogram.observe(puntos)
+
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": partida.puntajes}
 
 @app.get("/partidas/{partida_id}/estadisticas")

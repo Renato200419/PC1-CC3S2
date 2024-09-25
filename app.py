@@ -26,7 +26,8 @@ class Partida(BaseModel):
 
 # 1. Contador de jugadores registrados
 jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores registrados") # Punto 1
-
+#Contador de partidas creadas
+partidas_counter= Counter("partidas_creadas_totales","Total de partidas creadas")
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
 puntajes_histogram = Histogram("puntajes_altos", "Distribución de puntuaciones altas", buckets=[10, 20, 30, 40, 50, 60])
@@ -47,6 +48,8 @@ def crear_partida(jugadores: List[Jugador]):
         raise HTTPException(status_code=400, detail="Se requieren al menos 2 jugadores")
     nueva_partida = Partida(id=len(partidas) + 1, jugadores=jugadores, puntajes={jugador.nombre: 0 for jugador in jugadores})
     partidas.append(nueva_partida)
+    
+    partidas_counter.inc()
     return {"mensaje": f"Partida {nueva_partida.id} creada con éxito", "partida": nueva_partida}
 
 @app.post("/partidas/{partida_id}/lanzar")

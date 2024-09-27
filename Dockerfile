@@ -8,8 +8,8 @@ COPY . /app
 WORKDIR /app
 COPY requirements.txt ./
 
-# Instalamos las dependencias necesarias: FastAPI y Uvicorn
+# Instalamos las dependencias necesarias
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Comando para ejecutar la aplicación con Uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

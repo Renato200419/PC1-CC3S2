@@ -22,7 +22,7 @@ Este documento proporciona una guía detallada sobre cómo instalar, ejecutar y 
 Para iniciar el cliente de consola y comenzar a jugar:
 1. **Ejecutar el Cliente**:
    ```bash
-   python main.py
+   python game_console.py
    ```
 ## Guía de Uso
 ### Unirse a una Partida

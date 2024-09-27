@@ -1,0 +1,55 @@
+import requests
+
+API_BASE_URL = "http://localhost:8000"
+
+def registrar_jugador():
+    nombre = input("Ingresa el nombre del jugador: ")
+    respuesta = requests.post(f"{API_BASE_URL}/jugadores/", json={"nombre": nombre})
+    print(respuesta.json().get('mensaje'))
+
+def crear_partida():
+    numero_de_jugadores = int(input("Ingresa el número de jugadores: "))
+    jugadores = []
+    for _ in range(numero_de_jugadores):
+        nombre = input("Ingresa el nombre del jugador: ")
+        jugadores.append({"nombre": nombre})
+    respuesta = requests.post(f"{API_BASE_URL}/partidas/", json=jugadores)
+    print(respuesta.json().get('mensaje'))
+
+def lanzar_dados():
+    id_partida = int(input("Ingresa el ID de la partida para lanzar los dados: "))
+    respuesta = requests.post(f"{API_BASE_URL}/partidas/{id_partida}/lanzar")
+    print(respuesta.json().get('mensaje'))
+    print("Puntuaciones:", respuesta.json().get('puntajes'))
+
+def mostrar_estadisticas():
+    id_partida = int(input("Ingresa el ID de la partida para ver estadísticas: "))
+    respuesta = requests.get(f"{API_BASE_URL}/partidas/{id_partida}/estadisticas")
+    print("Puntuaciones:", respuesta.json().get('puntajes'))
+
+def menu_principal():
+    while True:
+        print("""
+        1. Registrar Jugador
+        2. Crear Partida
+        3. Lanzar Dados
+        4. Mostrar Estadísticas
+        5. Salir
+        """)
+        opcion = input("Elige una opción: ")
+        if opcion == '1':
+            registrar_jugador()
+        elif opcion == '2':
+            crear_partida()
+        elif opcion == '3':
+            lanzar_dados()
+        elif opcion == '4':
+            mostrar_estadisticas()
+        elif opcion == '5':
+            print("Saliendo del juego. ¡Gracias por jugar!")
+            break
+        else:
+            print("Opción inválida, por favor elige nuevamente.")
+
+if __name__ == "__main__":
+    menu_principal()

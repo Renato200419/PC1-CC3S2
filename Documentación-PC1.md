@@ -5,17 +5,7 @@
 4. [Docker y Contenedores](#Documentación-de-Docker-y-Docker-Compose)
 5. [Monitorización y Observabilidad](#Configuración-de-Observabilidad:-Prometheus-y-Grafana)
 6. [Uso de Git](#Uso-de-Git-y-Resolución-de-Conflictos-en-el-Proyecto)
-
-
-
-
-
-
-
-
-
-
-
+7. [Manejo de Branches](#)
 
 
 
@@ -951,3 +941,147 @@ El integrante Barriga lee el comentario y tras analizar la causa de que la API n
 Con esto nuestro gráfico de las ramas se ve así:
 
 ![[branches.png]](Imagenes-git/branches.png)
+
+---
+
+# Reporte Detallado del Manejo de Branches en Orden Cronológico
+
+## 1. **Commit Inicial (hace 7 días)**
+- **dd52aed**: *"Initial commit: added README and .gitignore"* por **Jorge Barriga**.
+- **Descripción**: Se estableció la base del repositorio con los archivos iniciales necesarios.
+
+---
+
+## 2. **Creación y Merge de `feature/estructura-basica`**
+- **Branch**: `feature/estructura-basica` creado por **Renato200419**.
+- **Commits en la rama**:
+  - **6fff542**: *"Se sube la estructura básica del Juego"* por **Renato200419**.
+- **Merge**:
+  - **Commit**: **d89b1f1**
+  - **Acción**: Merge del pull request #1 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se añadió la estructura fundamental del juego, estableciendo las bases para el desarrollo posterior.
+
+---
+
+## 3. **Creación y Merge de `feature/docker-setup`**
+- **Branch**: `feature/docker-setup` creado por **Renato200419**.
+- **Commits en la rama**:
+  - **2d1ba9f**: *"Subir Dockerfile"* por **Renato200419**.
+  - **cb0b4c7**: *"Se configuró el puerto en main.py"* por **Renato200419**.
+- **Merge**:
+  - **Commit**: **9d712f4**
+  - **Acción**: Merge del pull request #2 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se añadió el Dockerfile y se configuró el puerto en `main.py` para facilitar la implementación en contenedores.
+
+---
+
+## 4. **Creación y Merge de `feature/api`**
+- **Branch**: `feature/api` creado por **Jorge Barriga**.
+- **Commits en la rama**:
+  - **fd31007**: *"Añadir class Jugador y la ruta para registrar jugadores"* por **Jorge Barriga**.
+  - **1470329**: *"Añadir class Partida y la ruta para crear nuevas partidas"* por **Jorge Barriga**.
+  - **34885ba**: *"Implementar la ruta para lanzar dados en una partida"* por **Jorge Barriga**.
+  - **9d92e9b**: *"Reordenar y limpiar el código para mejorar legibilidad"* por **Jorge Barriga**.
+  - **15b2918**: *"Implementar ruta para consultar estadísticas de partidas"* por **Jorge Barriga**.
+- **Merge**:
+  - **Commit**: **8850d17**
+  - **Acción**: Merge del pull request #3 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se desarrollaron las rutas principales de la API, incluyendo funcionalidades para jugadores y partidas.
+
+---
+
+## 5. **Actualización y Merge de `feature/docker-setup`**
+- **Actualización de la rama** por **Renato200419**.
+- **Commits adicionales**:
+  - **0653459**: *"Correción en la línea de COPY del Dockerfile"*.
+  - **e0ee16a**: *"Se agrega la estructura básica del docker-compose para la aplicación"*.
+- **Merge**:
+  - **Commit**: **bf985f9**
+  - **Acción**: Merge del pull request #4 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se corrigió el Dockerfile y se añadió un `docker-compose` para gestionar los servicios.
+
+---
+
+## 6. **Creación y Merge de `feature/devsecops`**
+- **Branch**: `feature/devsecops` para configurar workflows.
+- **Commit**:
+  - **6cc559f**: *"Configuración de GitHub Workflows"* por **Jorge Barriga**.
+- **Merge**:
+  - **Commit**: **d809ba9**
+  - **Acción**: Merge del pull request #5 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se establecieron las bases para la integración continua y prácticas de DevSecOps.
+
+---
+
+## 7. **Creación y Merge de `fix/ci-pipeline`**
+- **Branch**: `fix/ci-pipeline` para solucionar problemas en el pipeline de CI.
+- **Commits en la rama**:
+  - **e799c19**: *"Agregar CI pipeline para pruebas en GitHub Actions"* por **al-2100**.
+  - **ef939f7** y **daa0434**: *"Test en branch /fix/ci-pipeline"* por **Jorge Barriga**.
+  - **0672469**: *"Agregar requirements.txt con dependencias del proyecto"* por **Jorge Barriga**.
+  - **2956a17**: *"Retirar tests (temporalmente)"* por **Jorge Barriga**.
+  - **c6bd1f4**: *"Retirar fix/ci-pipeline del pipeline CI"* por **Jorge Barriga**.
+- **Merge**:
+  - **Commit**: **72fd1f1**
+  - **Acción**: Merge del pull request #6 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se resolvieron errores en el pipeline de integración continua, mejorando la estabilidad del proceso de CI/CD.
+
+---
+
+## 8. **Desarrollo de la Interfaz de Consola**
+### a. **Creación de `feature/interfaz` y Sub-branches**
+- **Branch principal**: `feature/interfaz` para desarrollar la interfaz de usuario.
+- **Sub-branch**: `feature/interfaz-crear_partida`
+  - **Commit**:
+    - **988a08b**: *"Se agrega la función crear-partida"* por **Renato200419**.
+  - **Merge**:
+    - **Commit**: **61098d2**
+    - **Acción**: Merge del pull request #9 a `feature/interfaz`.
+    - **Responsable**: **ISMA12345830**.
+- **Sub-branch**: `feature/interfaz-mostrar_estadisticas`
+  - **Commit**:
+    - **f26e094**: *"Se agrega la función mostrar estadisticas"* por **ISMA12345830**.
+  - **Merge**:
+    - **Commit**: **cf0936d**
+    - **Acción**: Merge del pull request #10 a `feature/interfaz`.
+    - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Commits adicionales en `feature/interfaz`**:
+  - **c95e6e3**: *"Se agregan más funciones para la interfaz consola: lanzar_dados y registrar_jugador"* por **Renato200419**.
+  - **48ea60b**: *"Se agrego el menu principal"* por **ISMA12345830**.
+- **Merge a la rama principal**:
+  - **Commit**: **9852026**
+  - **Acción**: Merge del pull request #11 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se desarrolló la interfaz de consola, permitiendo interacción con el usuario para registrar jugadores, crear partidas y mostrar estadísticas.
+
+---
+
+## 9. **Actualizaciones en la API**
+- **Branch**: `feature/api` actualizado.
+- **Commit**:
+  - **b394175**: *"Se añadio uvicorn"* por **ISMA12345830**.
+- **Merge**:
+  - **Commit**: **f481306**
+  - **Acción**: Merge del pull request #12 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se añadió `uvicorn` para el despliegue del servidor ASGI, mejorando el rendimiento de la aplicación.
+
+---
+
+## 10. **Implementación de Pruebas**
+- **Branch**: `feature/pruebas` creado por **ISMA12345830**.
+- **Commit**:
+  - **6ab1738**: *"Configurar pruebas básicas en test_app.py"*.
+- **Merge**:
+  - **Commit**: **06cb580**
+  - **Acción**: Merge del pull request #13 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se añadieron pruebas unitarias básicas para garantizar el correcto funcionamiento de las funcionalidades implementadas.
+
+---

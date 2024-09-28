@@ -10,3 +10,5 @@ prometheus-fastapi-instrumentator
 requests~=2.32.3
 
 peewee~=3.17.6
+psycopg2-binary==2.9.6
+

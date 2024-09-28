@@ -5,7 +5,7 @@
 4. [Docker y Contenedores](#Documentación-de-Docker-y-Docker-Compose)
 5. [Monitorización y Observabilidad](#Configuración-de-Observabilidad:-Prometheus-y-Grafana)
 6. [Uso de Git](#Uso-de-Git-y-Resolución-de-Conflictos-en-el-Proyecto)
-7. [Manejo de Branches](#)
+7. [Manejo de Branches](#Reporte-Detallado-del-Manejo-de-Branches-en-Orden-Cronológico)
 
 
 
@@ -1083,5 +1083,140 @@ Con esto nuestro gráfico de las ramas se ve así:
   - **Acción**: Merge del pull request #13 a la rama principal.
   - **Responsable**: **Jorge Barriga**.
 - **Descripción**: Se añadieron pruebas unitarias básicas para garantizar el correcto funcionamiento de las funcionalidades implementadas.
+
+---
+
+## 11. **Actualización del Pipeline de CI/CD**
+- **Branch**: `feature/actualizar-ci` para mejorar el pipeline.
+- **Commits**:
+  - Ajustes en `ci.yml`, actualización de dependencias y corrección de errores por **ISMA12345830** y **Jorge Barriga**.
+- **Merge**:
+  - **Commit**: **4fb7d3f**
+  - **Acción**: Merge del pull request #16 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se optimizó el pipeline de CI/CD, incluyendo la actualización de `PYTHONPATH` y la instalación de dependencias necesarias.
+
+---
+
+## 12. **Configuración de Prometheus y Grafana**
+### a. **Branch `prometheus-config`**
+- **Commit**:
+  - **234ef9a**: *"Crear prometheus.yml"* por **Renato200419**.
+- **Merge**:
+  - **Commit**: **6199f8f**
+  - **Acción**: Merge del pull request #14 a la rama principal.
+  - **Responsable**: **ISMA12345830**.
+
+### b. **Actualización de `feature/docker-setup`**
+- **Commit**:
+  - **ed971b5**: *"Actualizar docker-compose.yml para incluir Prometheus y Grafana"* por **Renato200419**.
+- **Merge**:
+  - **Commit**: **7102deb**
+  - **Acción**: Merge del pull request #15 a la rama principal.
+  - **Responsable**: **ISMA12345830**.
+- **Descripción**: Se integraron Prometheus y Grafana al entorno Docker para la monitorización y visualización de métricas.
+
+---
+
+## 13. **Implementación y Corrección de Métricas**
+- **Branch**: `feature/metrics` creado por **Renato200419**.
+- **Commits**:
+  - **a93f901**: *"Agregar prometheus_fastapi_instrumentator y prometheus_client"*.
+  - **95d2fdb**: *"Modificar app.py para incluir métricas de tiradas y latencia"*.
+  - **aa19308**: *"Actualizar la forma en la que se instalan las dependencias"*.
+- **Merge y Reversiones**:
+  - **Merge** del pull request #19.
+  - Reversiones realizadas para corregir errores en las métricas implementadas.
+- **Descripción**: Se añadieron métricas personalizadas y se realizaron ajustes para asegurar su correcto funcionamiento.
+
+---
+
+## 14. **Configuración Adicional de Prometheus y Grafana**
+- **Branch**: `feature/configurar-prometheus-grafana` por **Renato Steven Olivera Calderón**.
+- **Commits**:
+  - **9429051**: *"Actualización del docker-compose para almacenar datos"*.
+  - **08cbbad**: *"Dashboard creado"*.
+- **Merge**:
+  - **Commit**: **ab3261f**
+  - **Acción**: Merge del pull request #21 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se configuró el almacenamiento de datos y se creó un dashboard personalizado en Grafana.
+
+---
+
+## 15. **Ampliación de la Documentación**
+- **Branches creados**:
+  - `feature/documentation-docker`
+  - `feature/documentation-observability`
+  - `feature/documentation-git-usage`
+  - `feature/documentation-devsecops`
+  - `feature/documentation-api`
+  - `feature/documentation-readme`
+  - `feature/documentation-cherry-pick`
+  - `feature/documentation-client`
+- **Commits destacados**:
+  - **572a11f**: *"Subir documentación Docker.md"*.
+  - **2b86073**: *"Se agrega el archivo Markdown que explica la Observabilidad en el proyecto"*.
+  - **6a996a7**: *"Subir documentación del uso de Git y resolución de conflictos"*.
+  - **97723af**: *"Documentación DevSecOps"*.
+  - **e5507da**: *"Documentación sobre la API"*.
+  - **bde777f**: *"Actualizacion -  README.md"*.
+  - **8d8c575**: *"Actualizar documentación: Incluir uso de cherry-pick"*.
+  - **1ab81e9**: *"Agregando archivo.md"*.
+  - **7ec771b**: *"Participacion de los jugadores en las partidas"*.
+- **Merges**: Pull requests #22 al #29 fusionados a la rama principal.
+- **Descripción**: Se enriqueció la documentación del proyecto en diversas áreas, facilitando la comprensión y colaboración.
+
+---
+
+## 16. **Implementación de Métricas Avanzadas y Resolución de Conflictos**
+- **Branches y Commits**:
+  - **feature/metrics-update-contador-players**
+    - **531c28a**: *"Subir métrica de contador de jugadores registrados"*.
+    - **Revertido**: mediante pull request #34.
+  - **feature/metrics-update-histogram**
+    - **b5b9033**: *"Agregar métrica para jugadores con puntajes >=4"*.
+    - **Revertido**: mediante pull request #38.
+  - **feature/metrics-update-jugadores_registrados**, **feature/metrics-update-puntuaciones_altas**, **feature/metrics-update-cantidad_partidas**
+    - Múltiples commits y merges para ajustar las métricas.
+- **Descripción**: Se implementaron nuevas métricas y se resolvieron conflictos surgidos durante su integración.
+
+---
+
+## 17. **Refactorización de la Estructura del Proyecto**
+- **Branch**: `feature/refactor-structure` por **Renato Steven Olivera Calderón**.
+- **Commits**:
+  - **a4568b6**: *"Reorganiza la estructura del proyecto y renombra archivos"* por **Jorge Barriga**.
+  - **e0468a4**: *"Modificar Dockerfile para la nueva estructura"*.
+- **Merge**:
+  - **Commit**: **b8cc60b**
+  - **Acción**: Merge del pull request #44 a la rama principal.
+  - **Responsable**: **Renato Steven Olivera Calderón**.
+- **Descripción**: Se reorganizó la estructura del proyecto para mejorar la mantenibilidad y escalabilidad.
+
+---
+
+## 18. **Integración de la Base de Datos**
+- **Branch**: `feature/database-integration` por **Renato200419**.
+- **Commits**:
+  - **e4b5790**: *"Añadir modelos de Jugador y Partida con Peewee"*.
+  - **8e726ab**: *"Configurar conexión a PostgreSQL e inicializar tablas"*.
+  - **4287cb5**: *"Agregar funciones CRUD para Jugador y Partida"*.
+- **Merge**:
+  - **Commit**: **25bb6b6**
+  - **Acción**: Merge del pull request #45 a la rama principal.
+  - **Responsable**: **Jorge Barriga**.
+- **Descripción**: Se integró la base de datos PostgreSQL al proyecto, permitiendo operaciones CRUD y persistencia de datos.
+
+---
+
+## 19. **Actualizaciones Finales**
+- **Commits directos** a la rama principal por **Jorge Barriga**:
+  - **14d3d1b**: *"Implementar rutas para gestionar jugadores y partidas en routes.py"*.
+  - **4cfc3bf**: *"Modificar main.py para exponer las rutas y métricas"*.
+  - **d106d8a**: *"Actualizar dependencias"*.
+  - **fe76c33**: *"Añadir dependencias"*.
+  - **e0b4c79**: *"Agregar servicio de PostgreSQL en GitHub Actions"*.
+- **Descripción**: Mejoras y ajustes finales para asegurar el correcto funcionamiento del proyecto.
 
 ---

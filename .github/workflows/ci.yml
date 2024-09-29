@@ -19,13 +19,13 @@ jobs:
           POSTGRES_USER: admin
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: dadosdb
-        options: >-
-          --health-cmd="pg_isready -U admin -d dadosdb" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=10
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin -d dadosdb" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 10
 
     steps:
       - name: Checkout code
@@ -42,25 +42,17 @@ jobs:
           pip install --upgrade setuptools
           pip install -r requirements.txt
 
-      - name: Verify PostgreSQL Health Status
+      - name: Wait for PostgreSQL to be ready
         run: |
-          echo "Verifying PostgreSQL health status..."
-          docker ps
-          docker inspect --format='{{json .State.Health}}' $(docker ps -q --filter ancestor=postgres:13)
-
-      - name: Check PostgreSQL container IP
-        run: |
-          POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter ancestor=postgres:13))
-          echo "PostgreSQL IP is $POSTGRES_IP"
-          until pg_isready -h $POSTGRES_IP -p 5432 -U admin; do
-            echo "Waiting for PostgreSQL to be available on $POSTGRES_IP..."
+          echo "Waiting for PostgreSQL to be ready..."
+          until pg_isready -h localhost -p 5432 -U admin -d dadosdb; do
             sleep 5
           done
           echo "PostgreSQL is ready!"
 
       - name: Run tests
         env:
-          DATABASE_URL: postgresql://admin:secret@db:5432/dadosdb
+          DATABASE_URL: postgresql://admin:secret@localhost:5432/dadosdb
           PYTHONPATH: .
         run: |
           pytest tests/

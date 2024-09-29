@@ -8,17 +8,17 @@ import uvicorn
 # Crear la aplicación FastAPI
 app = FastAPI()
 
-# Inicializar la base de datos
-initialize_db()
-
-# Inicializar el instrumentador para Prometheus
-instrumentator = Instrumentator()
-
 # Incluir las rutas desde el router
 app.include_router(router)
 
 # Instrumentar la aplicación y exponer las métricas
+instrumentator = Instrumentator()
 instrumentator.instrument(app).expose(app)
+
+# Inicializar la base de datos en el evento de inicio de la aplicación
+@app.on_event("startup")
+def startup_event():
+    initialize_db()
 
 @app.get("/")
 def read_root():

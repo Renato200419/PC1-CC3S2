@@ -73,6 +73,12 @@ jobs:
         run: |
           docker run -d --network juego-dados-network --name juego-dados -p 8000:8000 juego-dados-competitivo
 
+      - name: Verify container status
+        run: docker ps -a
+
+      - name: Show Docker logs
+        run: docker logs juego-dados
+
       - name: Wait for FastAPI to be ready
         run: |
           until curl -s http://juego-dados:8000/; do

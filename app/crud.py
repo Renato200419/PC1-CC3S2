@@ -1,4 +1,3 @@
-# app/crud.py
 from .models import Jugador, Partida, JugadoresPartidas
 
 # Crear un nuevo jugador

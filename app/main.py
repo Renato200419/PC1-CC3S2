@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 from .database import initialize_db
-from .routes import router  # Importar el enrutador de rutas
+from .routes import router
 
 import uvicorn
 

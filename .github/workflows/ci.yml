@@ -67,7 +67,13 @@ jobs:
         run: docker build -t juego-dados-competitivo .
 
       - name: Run Docker container
-        run: docker run -d -p 8000:8000 juego-dados-competitivo
+        run: |
+          docker run -d \
+            --name juego-dados-competitivo \
+            --network host \
+            -e DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb \
+            -p 8000:8000 \
+            juego-dados-competitivo
 
       - name: Wait for FastAPI to be ready
         run: |
@@ -76,3 +82,4 @@ jobs:
             sleep 5
           done
           echo "FastAPI is ready!"
+          

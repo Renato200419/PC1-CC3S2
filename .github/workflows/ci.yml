@@ -66,20 +66,23 @@ jobs:
       - name: Build Docker image
         run: docker build -t juego-dados-competitivo .
 
+      - name: Create Docker network
+        run: docker network create juego-dados-network
+
       - name: Run Docker container
         run: |
-          docker run -d \
-            --name juego-dados-competitivo \
-            --network host \
-            -e DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb \
-            -p 8000:8000 \
-            juego-dados-competitivo
+          docker run -d --network juego-dados-network --name juego-dados -p 8000:8000 juego-dados-competitivo
 
       - name: Wait for FastAPI to be ready
         run: |
-          until curl -s http://localhost:8000/; do
+          until curl -s http://juego-dados:8000/; do
             echo "Esperando a que FastAPI esté disponible..."
             sleep 5
           done
           echo "FastAPI is ready!"
-          
+
+      - name: Stop and remove containers and network
+        run: |
+          docker stop juego-dados
+          docker rm juego-dados
+          docker network rm juego-dados-network

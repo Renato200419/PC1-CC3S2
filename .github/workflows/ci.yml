@@ -76,17 +76,6 @@ jobs:
       - name: Verify container status
         run: docker ps -a
 
-      - name: Show Docker logs
-        run: docker logs juego-dados
-
-      - name: Wait for FastAPI to be ready
-        run: |
-          until curl -s http://juego-dados:8000/; do
-            echo "Esperando a que FastAPI esté disponible..."
-            sleep 5
-          done
-          echo "FastAPI is ready!"
-
       - name: Stop and remove containers and network
         run: |
           docker stop juego-dados

@@ -1,3 +1,4 @@
+# pipeline.yml
 name: CI/CD Pipeline
 
 on:
@@ -11,21 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    services:
-      db:  # Definir el servicio de PostgreSQL
-        image: postgres:13
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: dadosdb
-        options: >-
-          --health-cmd="pg_isready -U admin -d dadosdb" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=5
-        ports:
-          - 5432:5432
 
     steps:
       - name: Checkout code
@@ -42,17 +28,10 @@ jobs:
           pip install --upgrade setuptools
           pip install -r requirements.txt
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h db -p 5432 -U admin; do
-            echo "Waiting for PostgreSQL to be available..."
-            sleep 5
-          done
+      - name: Set PYTHONPATH environment variable
+        run: echo "PYTHONPATH=${{ github.workspace }}:${{ github.workspace }}/app" >> $GITHUB_ENV
 
       - name: Run tests
-        env:
-          DATABASE_URL: postgresql://admin:secret@db:5432/dadosdb
-          PYTHONPATH: .
         run: |
           pytest tests/
 
@@ -63,12 +42,23 @@ jobs:
         run: pip-audit
 
       - name: Build Docker image
-        run: docker build -t juego-dados-competitivo .
+        run: docker-compose build
 
-      - name: Run Docker container
-        run: docker run -d -p 8000:8000 juego-dados-competitivo
+      - name: Start Docker services
+        run: docker-compose up -d
 
-      - name: Wait for FastAPI to be ready
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          echo "Esperando a que PostgreSQL esté disponible..."
+          until docker exec -it $(docker ps -qf "name=db") pg_isready -U admin; do
+            sleep 5
+          done
+          echo "PostgreSQL está listo"
+
+      - name: Run FastAPI container
+        run: docker-compose up -d app
+
+      - name: Verify FastAPI service
         run: |
           until curl -s http://localhost:8000/; do
             echo "Esperando a que FastAPI esté disponible..."

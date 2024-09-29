@@ -48,10 +48,12 @@ jobs:
           docker ps
           docker inspect --format='{{json .State.Health}}' $(docker ps -q --filter ancestor=postgres:13)
 
-      - name: Wait for PostgreSQL to be ready
+      - name: Check PostgreSQL container IP
         run: |
-          until pg_isready -h db -p 5432 -U admin; do
-            echo "Waiting for PostgreSQL to be available..."
+          POSTGRES_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter ancestor=postgres:13))
+          echo "PostgreSQL IP is $POSTGRES_IP"
+          until pg_isready -h $POSTGRES_IP -p 5432 -U admin; do
+            echo "Waiting for PostgreSQL to be available on $POSTGRES_IP..."
             sleep 5
           done
           echo "PostgreSQL is ready!"

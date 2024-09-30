@@ -12,7 +12,7 @@ def registrar_jugador():
     nombre = input("Ingresa el nombre del jugador: ")
     respuesta = requests.post(f"{API_BASE_URL}/jugadores/", json={"nombre": nombre})
     #print(respuesta.json().get('mensaje'))
-    if respuesta.status_code == 201:
+    if respuesta.status_code == 200:
         print(Fore.GREEN + respuesta.json().get('mensaje') + Style.RESET_ALL)
     else:
         print(Fore.RED + "Error al registrar el jugador. Intenta nuevamente." + Style.RESET_ALL)
@@ -25,7 +25,7 @@ def crear_partida():
             nombre = input(Fore.CYAN + "Ingresa el nombre del jugador: " + Fore.WHITE)
             jugadores.append({"nombre": nombre})
         respuesta = requests.post(f"{API_BASE_URL}/partidas/", json=jugadores)
-        if respuesta.status_code == 201:
+        if respuesta.status_code == 200:
             print(Fore.GREEN + respuesta.json().get('mensaje') + Style.RESET_ALL)
         else:
             print(Fore.RED + "Error al crear la partida. Intenta nuevamente." + Style.RESET_ALL)

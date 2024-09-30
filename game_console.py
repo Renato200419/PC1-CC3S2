@@ -18,7 +18,7 @@ def registrar_jugador():
         print(Fore.RED + "Error al registrar el jugador. Intenta nuevamente." + Style.RESET_ALL)
 
 def crear_partida():
-try:
+    try:
         numero_de_jugadores = int(input(Fore.CYAN + "Ingresa el número de jugadores: " + Fore.WHITE))
         jugadores = []
         for _ in range(numero_de_jugadores):

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from prometheus_client import Counter, Histogram
-from .crud import create_jugador, get_jugador_by_name, create_partida, get_partida_by_id, update_puntajes
+from .crud import create_jugador, get_jugador_by_name,get_all_jugadores, create_partida, get_partida_by_id, update_puntajes
 import random
 
 # Crear el enrutador de FastAPI
@@ -32,6 +32,13 @@ def registrar_jugador(jugador: Jugador):
     create_jugador(jugador.nombre)
     jugadores_counter.inc()  # Incrementar el contador de jugadores
     return {"mensaje": f"Jugador {jugador.nombre} registrado con éxito"}
+#LISTAR LOS JUGADORES:
+@router.get("/jugadores/")
+def listar_jugadores():
+    jugadores = get_all_jugadores()
+    if not jugadores:
+        return {"mensaje": "No hay jugadores registrados"}
+    return {"jugadores": [jugador.nombre for jugador in jugadores]}
 
 @router.post("/partidas/")
 def crear_partida_endpoint(jugadores: List[Jugador]):
@@ -66,3 +73,12 @@ def obtener_estadisticas(partida_id: int):
         raise HTTPException(status_code=404, detail="Partida no encontrada")
     puntajes = eval(partida.puntajes)
     return {"partida_id": partida.id, "puntajes": puntajes}
+
+@router.post("/partidas/{partida_id}/reiniciar")
+def reiniciar_partida(partida_id: int):
+    partida = get_partida_by_id(partida_id)
+    if not partida:
+        raise HTTPException(status_code=404, detail="Partida no encontrada")
+    puntajes = {jugador.jugador.nombre: 0 for jugador in partida.jugadores}
+    update_puntajes(partida, puntajes)
+    return {"mensaje": f"Partida {partida_id} reiniciada con éxito", "puntajes": puntajes}

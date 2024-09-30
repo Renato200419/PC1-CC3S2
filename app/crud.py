@@ -1,4 +1,5 @@
 from .models import Jugador, Partida, JugadoresPartidas
+from typing import List
 
 # Crear un nuevo jugador
 def create_jugador(nombre: str) -> Jugador:
@@ -25,3 +26,7 @@ def get_partida_by_id(partida_id: int) -> Partida:
 def update_puntajes(partida: Partida, nuevos_puntajes: dict) -> None:
     partida.puntajes = str(nuevos_puntajes)
     partida.save()
+
+# Obtener todos los jugadores
+def get_all_jugadores() -> List[Jugador]:
+    return list(Jugador.select())

@@ -27,6 +27,7 @@ services:
     image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
+      - prometheus_data:/prometheus  # Persistencia de datos de Prometheus
     ports:
       - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
     depends_on:
@@ -46,3 +47,4 @@ services:
 volumes:
   postgres_data:  # Volumen para persistir los datos de PostgreSQL
   grafana_data:  # Volumen para persistir los datos de Grafana
+  prometheus_data:  # Volumen para persistir los datos de Prometheus

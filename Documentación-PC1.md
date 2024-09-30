@@ -1,18 +1,85 @@
 # Índice
-1. [API REST](#AP_REST-Juego_de_Dados_Competitivo)
-2. [Cliente de Consola](#Documentación-del-Cliente-de-Consola)
-3. [DevSecOps](#DevSecOps)
-4. [Docker y Contenedores](#Documentación-de-Docker-y-Docker-Compose)
-5. [Monitorización y Observabilidad](#Configuración-de-Observabilidad:-Prometheus-y-Grafana)
-6. [Uso de Git](#Uso-de-Git-y-Resolución-de-Conflictos-en-el-Proyecto)
-7. [Manejo de Branches](#Reporte-Detallado-del-Manejo-de-Branches-en-Orden-Cronológico)
+
+## 1. Introducción
+
+### [1.1 Descripción del Proyecto](#descripción-del-proyecto)
+### [1.2 Objetivos](#objetivos)
+### [1.3 Requisitos](#requisitos)
+
+## 2. Desarrollo del Proyecto
+
+### [2.1 Estructura de la API REST](#api-rest---juego-de-dados-competitivo)
+#### [2.1.1 Rutas Principales y Funcionalidades](#endpoints-de-la-api)
+#### [2.1.2 Gestión de Jugadores y Partidas](#explicación-de-las-clases-y-almacenamiento-de-datos)
+
+### [2.2 Observabilidad y Monitorización](#observabilidad-y-monitorización)
+#### [2.2.1 Configuración de Prometheus y Grafana](#configuración-de-observabilidad-prometheus-y-grafana)
+#### [2.2.2 Métricas Personalizadas]
+
+### [2.3 Contenerización con Docker]
+#### [2.3.1 Dockerfile y Docker Compose]
+#### [2.3.2 Integración con PostgreSQL]
+
+### [2.4 Simulación de Partidas Competitivas]
+#### [2.4.1 Cliente de Consola para Interacción]
+#### [2.4.2 Manejo de Estadísticas]
+
+## Gestión del Proyecto con Git
+
+### [3.1 Flujo de Trabajo con GitHub Flow]
+#### [3.1.1 Creación de Ramas y Commits]
+#### [3.1.2 Resolución de Conflictos]
+### [3.2 Uso de Cherry-pick y Reversiones]
+### [3.3 Uso de Revert y Squash]
+
+## DevSecOps e Integración Continua
+
+### [4.1 Integración de DevSecOps]
+### [4.2 Mejoras en el Pipeline CI/CD]
+### [4.3 Pruebas Unitarias y de Integración]
+
+## Actualizaciones y Refactorización
+
+### [5.1 Refactorización de la Estructura del Proyecto]
+### [5.2 Actualizaciones en la API y la Base de Datos]
+
+## Conclusiones y Futuras Mejoras
+
+### [6.1 Logros Obtenidos]
+### [6.2 Retos y Dificultades]
+### [6.3 Oportunidades de Mejora]
 
 
+---
 
+# Descripción del Proyecto
 
+Desarrollo de un juego de dados competitivo en el que los jugadores compiten por obtener la mayor puntuación a través de lanzamientos de dados. La aplicación cuenta con una API REST para gestionar jugadores y partidas, almacenamiento de datos en PostgreSQL, monitorización de métricas en tiempo real con Prometheus y Grafana, y contenerización con Docker. Además, se implementan prácticas de DevSecOps y pruebas automatizadas para asegurar la calidad y seguridad del proyecto.
 
+---
+# Objetivos
+ - Implementar una API REST que gestione las partidas y registre las puntuaciones.
+ - Desarrollar un cliente de consola para que los jugadores participen en las partidas.
+ - Implementar DevSecOps: Configurar un análisis de seguridad específico del lenguaje (pip-audit para Python) y GitHub Actions para CI/CD.
+ - Usar Docker y Docker Compose para contenerizar la aplicación y gestionar los servicios.
+ - Configurar Prometheus y Grafana para monitorear las métricas del juego, como la cantidad de tiradas y la latencia de la API.
+ - Integrar una base de datos relacional PostgreSQL para almacenar las estadísticas de los jugadores y resultados de las partidas.
+ - Resolver conflictos de fusión en Git usando git mergetool y documentar el proceso.
 
+---
 
+# Requisitos
+- **Lenguaje de Programación**: Python 3.8 o superior.
+- **Frameworks y Librerías**: FastAPI para la API REST, Peewee para la integración con PostgreSQL.
+- **Base de Datos**: PostgreSQL 13 o superior.
+- **Entorno de Contenerización**: Docker y Docker Compose.
+- **Monitorización**: Prometheus y Grafana.
+- **Control de Versiones**: Git y GitHub para la gestión de ramas y colaboración.
+- **Pipelines CI/CD**: Configuración de GitHub Actions para pruebas, integración continua y despliegue.
+- **Herramientas de DevSecOp**s: Pip-audit
+- **Entorno de Desarrollo**: Visual Studio Code o cualquier IDE compatible con Python y Docker.
+
+---
 
 # API REST - Juego de Dados Competitivo
 
@@ -289,6 +356,113 @@ Los datos se mantienen en la memoria del servidor mientras la aplicación esté 
 - **Random**: Se utiliza para generar tiradas de dados aleatorias en el rango de 1 a 6 para cada jugador.
 
 ---
+
+# Observabilidad y Monitorización
+En esta sección se describe cómo se ha configurado y utilizado Prometheus y Grafana para monitorizar el rendimiento y comportamiento de la API del juego de dados. La integración de estas herramientas permite recolectar y visualizar métricas personalizadas, facilitando la identificación de problemas de latencia y el monitoreo de eventos en tiempo real.
+
+# Configuración de Observabilidad: Prometheus y Grafana
+## Introducción
+En este proyecto, se utiliza Prometheus para recolectar métricas de la API REST del juego de dados, y Grafana para visualizar esas métricas. La monitorización nos permite rastrear el comportamiento de la API y detectar posibles problemas de rendimiento o errores, como latencia alta o un número inesperado de tiradas de dados.
+
+## Métricas Monitoreadas
+
+Se están monitoreando varias métricas clave del juego de dados y del rendimiento de la API:
+
+### 1. **Métricas Personalizadas**
+- **tiradas_totales_total**: Contador que registra el número total de tiradas de dados realizadas en el juego.
+- **latencia_api**: Histograma que mide la latencia de las solicitudes a la API REST en segundos.
+
+### 2. **Métricas Estándar (Prometheus FastAPI Instrumentation)**
+- **http_requests_total**: Número total de solicitudes HTTP realizadas a la API, desglosadas por método y estado HTTP.
+- **process_resident_memory_bytes**: Uso de memoria del proceso.
+- **process_cpu_seconds_total**: Tiempo total de CPU consumido por el proceso.
+
+## Configuración de Prometheus
+
+El archivo `prometheus.yml` contiene la configuración para que Prometheus raspe las métricas de la API del juego.
+
+### Archivo `prometheus.yml`:
+```yaml
+global:
+  scrape_interval: 15s  # Frecuencia con la que Prometheus raspa las métricas
+
+scrape_configs:
+  - job_name: 'py-app'  # Nombre del trabajo de monitoreo
+    static_configs:
+      - targets: ['app:8000']  # API del juego ejecutándose en el puerto 8000
+```
+Para acceder a Prometheus nos dirigimos a [http://localhost:9090](http://localhost:9090).
+
+## Configuración de Grafana
+
+Grafana se utiliza para visualizar las métricas recolectadas por Prometheus. Hemos configurado varios dashboards que muestran información clave sobre la aplicación.
+
+### 1. **Importación de Dashboards**
+- Los dashboards preconfigurados están en la carpeta `metrics_dashboards/`.
+- Para importar un dashboard en Grafana:
+  1. Acceder a Grafana en [http://localhost:3000](http://localhost:3000).
+  2. Ir a `Dashboards` > `Manage` > `Import`.
+  3. Seleccionar el archivo JSON desde `metrics_dashboards/` y seguir las instrucciones para configurar la fuente de datos.
+
+## Métricas Personalizadas en la API REST
+
+```python
+# Métricas de Prometheus
+jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores registrados")
+partidas_counter = Counter("partidas_creadas_totales", "Total de partidas creadas")
+tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
+latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
+puntajes_histogram = Histogram("puntajes_altos", "Distribución de puntuaciones altas", buckets=[10, 20, 30, 40, 50, 60])
+```
+
+
+
+
+## Consultas en Grafana
+
+A continuación se muestran algunas consultas comunes que se pueden utilizar en Grafana para visualizar las métricas recolectadas por Prometheus.
+
+### 1. **Tiradas Totales (tiradas_totales_total)**
+- Consulta para visualizar el número total de tiradas de dados en el último minuto:
+```promql
+increase(tiradas_totales_total[1m])
+```
+### 2. **Latencia de la API (latencia_api)**
+Consulta para ver la latencia promedio de la API:
+```promql
+rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
+```
+## Pasos que se realizaron en grafana y prometheus:
+1. Luego de usar el comando: `docker-compose up --build -d`, abrimos el enlace: [http://localhost:3000] y nos logeamos como: `admin` tanto en usuario como contraseña.
+![Descripción de la imagen](Imagenes-obs/Foto1_.png)
+2. De igual manera al ingrear link de Prometheus: 
+![Descripción de la imagen](Imagenes-obs/Foto2.png)
+3. Estando en Grafana nos dirigimos a Dashboards y configuramos una nueva `data source` que en este caso sería Prometheus lo configuramos
+![Descripción de la imagen](Imagenes-obs/Foto3.png)
+![Descripción de la imagen](Imagenes-obs/Foto4.png)
+![Descripción de la imagen](Imagenes-obs/Foto5.png)
+4. Importamos un dashboard llamado Métricas y luego agregamos un query para el panel: Latencia
+![Descripción de la imagen](Imagenes-obs/Foto6.png)
+5. Luego se duplicó el panel en el cual esta vez lo configuramos llamandolo: Tiradas_totales
+![Descripción de la imagen](Imagenes-obs/Foto7.png) 
+6. Entonces en main.py se jugaría una partida y se tiraría los dados. Finalmente vemos los cambios
+![Descripción de la imagen](Imagenes-obs/Foto8.png) 
+![Descripción de la imagen](Imagenes-obs/Foto9.png) 
+7. También se pudo visualizar en Prometheus, dando clic en `open metrics explorer` y luego se ejecuta.
+![Descripción de la imagen](Imagenes-obs/Foto10.png) 
+8. Para finalizar se importó el dashboard y se agregó a la rama.
+
+## Finalización con `pull request` y la aceptación del `merge`
+1. Al subir los cambios en la rama, se hace un `Compare & pull request`
+2. Se añade un título y una descripción breve.
+3. Luego se agrega un comentario avisando que estás esperando la aceptación de los cambios. [optional]
+4. Uno de los colaboradores acepta nuestros cambios.
+
+![Descripción de la imagen](Imagenes-obs/Foto11.png)
+
+
+---
+
 
 # Documentación del Cliente de Consola
 ## Propósito
@@ -717,90 +891,6 @@ volumes:
 
 ---
 
-# Configuración de Observabilidad: Prometheus y Grafana
-## Introducción
-En este proyecto, se utiliza Prometheus para recolectar métricas de la API REST del juego de dados, y Grafana para visualizar esas métricas. La monitorización nos permite rastrear el comportamiento de la API y detectar posibles problemas de rendimiento o errores, como latencia alta o un número inesperado de tiradas de dados.
-
-## Métricas Monitoreadas
-
-Se están monitoreando varias métricas clave del juego de dados y del rendimiento de la API:
-
-### 1. **Métricas Personalizadas**
-- **tiradas_totales_total**: Contador que registra el número total de tiradas de dados realizadas en el juego.
-- **latencia_api**: Histograma que mide la latencia de las solicitudes a la API REST en segundos.
-
-### 2. **Métricas Estándar (Prometheus FastAPI Instrumentation)**
-- **http_requests_total**: Número total de solicitudes HTTP realizadas a la API, desglosadas por método y estado HTTP.
-- **process_resident_memory_bytes**: Uso de memoria del proceso.
-- **process_cpu_seconds_total**: Tiempo total de CPU consumido por el proceso.
-
-## Configuración de Prometheus
-
-El archivo `prometheus.yml` contiene la configuración para que Prometheus raspe las métricas de la API del juego.
-
-### Archivo `prometheus.yml`:
-```yaml
-global:
-  scrape_interval: 15s  # Frecuencia con la que Prometheus raspa las métricas
-
-scrape_configs:
-  - job_name: 'py-app'  # Nombre del trabajo de monitoreo
-    static_configs:
-      - targets: ['app:8000']  # API del juego ejecutándose en el puerto 8000
-```
-Para acceder a Prometheus nos dirigimos a [http://localhost:9090](http://localhost:9090).
-## Configuración de Grafana
-
-Grafana se utiliza para visualizar las métricas recolectadas por Prometheus. Hemos configurado varios dashboards que muestran información clave sobre la aplicación.
-
-### 1. **Importación de Dashboards**
-- Los dashboards preconfigurados están en la carpeta `metrics_dashboards/`.
-- Para importar un dashboard en Grafana:
-  1. Acceder a Grafana en [http://localhost:3000](http://localhost:3000).
-  2. Ir a `Dashboards` > `Manage` > `Import`.
-  3. Seleccionar el archivo JSON desde `metrics_dashboards/` y seguir las instrucciones para configurar la fuente de datos.
-
-## Consultas en Grafana
-
-A continuación se muestran algunas consultas comunes que se pueden utilizar en Grafana para visualizar las métricas recolectadas por Prometheus.
-
-### 1. **Tiradas Totales (tiradas_totales_total)**
-- Consulta para visualizar el número total de tiradas de dados en el último minuto:
-```promql
-increase(tiradas_totales_total[1m])
-```
-### 2. Latencia de la API (latencia_api)
-Consulta para ver la latencia promedio de la API:
-```promql
-rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
-```
-## Pasos que se realizaron en grafana y tambi:
-1. Luego de usar el comando: `docker-compose up --build -d`, abrimos el enlace: [http://localhost:3000] y nos logeamos como: `admin` tanto en usuario como contraseña.
-![Descripción de la imagen](Imagenes-obs/Foto1_.png)
-2. De igual manera al ingrear link de Prometheus: 
-![Descripción de la imagen](Imagenes-obs/Foto2.png)
-3. Estando en Grafana nos dirigimos a Dashboards y configuramos una nueva `data source` que en este caso sería Prometheus lo configuramos
-![Descripción de la imagen](Imagenes-obs/Foto3.png)
-![Descripción de la imagen](Imagenes-obs/Foto4.png)
-![Descripción de la imagen](Imagenes-obs/Foto5.png)
-4. Importamos un dashboard llamado Métricas y luego agregamos un query para el panel: Latencia
-![Descripción de la imagen](Imagenes-obs/Foto6.png)
-5. Luego se duplicó el panel en el cual esta vez lo configuramos llamandolo: Tiradas_totales
-![Descripción de la imagen](Imagenes-obs/Foto7.png) 
-6. Entonces en main.py se jugaría una partida y se tiraría los dados. Finalmente vemos los cambios
-![Descripción de la imagen](Imagenes-obs/Foto8.png) 
-![Descripción de la imagen](Imagenes-obs/Foto9.png) 
-7. También se pudo visualizar en Prometheus, dando clic en `open metrics explorer` y luego se ejecuta.
-![Descripción de la imagen](Imagenes-obs/Foto10.png) 
-8. Para finalizar se importó el dashboard y se agregó a la rama.
-
-## Finalización con `pull request` y la aceptación del `merge`
-1. Al subir los cambios en la rama, se hace un `Compare & pull request`
-2. Se añade un título y una descripción breve.
-3. Luego se agrega un comentario avisando que estás esperando la aceptación de los cambios. [optional]
-4. Uno de los colaboradores acepta nuestros cambios.
-
-![Descripción de la imagen](Imagenes-obs/Foto11.png)
 
 ---
 

@@ -33,7 +33,7 @@ def crear_partida():
 
 def lanzamiento_animado():
     """Animación de lanzamiento de dados."""
-    print(Fore.YELLOW + "Lanzando dados...", end="")
+    print(Fore.YELLOW + "Lanzando dados...D", end="")
     for _ in range(3):
         print(".", end="", flush=True)
         time.sleep(0.5)
@@ -41,27 +41,42 @@ def lanzamiento_animado():
 
 def lanzar_dados():
     try:
+        # Ingresar y verificar el ID de la partida
         id_partida = int(input(Fore.CYAN + "Ingresa el ID de la partida para lanzar los dados: " + Fore.WHITE))
+        print(f"ID de la partida ingresado: {id_partida}")  # Verificar el ID ingresado antes de enviarlo a la API
+        
+        # Animación de lanzamiento de dados
         lanzamiento_animado()
+        
+        # Realizar la solicitud POST a la API para lanzar los dados
         respuesta = requests.post(f"{API_BASE_URL}/partidas/{id_partida}/lanzar")
+                
         if respuesta.status_code == 200:
+            # Extraer mensaje, puntajes y cambio de ranking de la respuesta
             mensaje = respuesta.json().get('mensaje')
             puntajes = respuesta.json().get('puntajes')
             cambio_ranking = respuesta.json().get('cambio_ranking', {})
 
+            # Mostrar los mensajes de éxito y puntajes actuales
             print(Fore.MAGENTA + mensaje + Style.RESET_ALL)
             print(Fore.CYAN + "Puntuaciones:" + Fore.WHITE, puntajes)
 
             # Verificar si la partida ha terminado y mostrar el cambio de ranking
             if cambio_ranking:
-                print(Fore.YELLOW + "\n=== Cambio de Ranking ===" + Style.RESET_ALL)
+                print(Fore.YELLOW + "\n=== ¡Cambios en la Clasificación! ===" + Style.RESET_ALL)
                 for jugador, posiciones in cambio_ranking.items():
                     print(f"{Fore.CYAN}{jugador}{Style.RESET_ALL}: {posiciones['posicion_inicial']} -> {posiciones['posicion_final']}")
-                
         else:
-            print(Fore.RED + "Error al lanzar los dados. Verifica el ID de la partida." + Style.RESET_ALL)
+            # Mostrar detalles de error si la solicitud falla
+            print(Fore.RED + f"Error al lanzar los dados. Verifica el ID de la partida. Código de estado: {respuesta.status_code}" + Style.RESET_ALL)
+            print(f"Detalles de la respuesta: {respuesta.text}")  # Depurar la respuesta para más detalles
     except ValueError:
+        # Manejar errores en la entrada de datos (por ejemplo, si no es un número entero)
         print(Fore.RED + "ID de la partida inválido, por favor ingresa un número entero." + Style.RESET_ALL)
+    except Exception as e:
+        # Manejar cualquier otro error inesperado
+        print(Fore.RED + f"Ocurrió un error inesperado: {e}" + Style.RESET_ALL)
+
 
 
 

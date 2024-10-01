@@ -102,7 +102,7 @@ def menu_principal():
         2. Crear Partida
         3. Lanzar Dados
         4. Mostrar Estadísticas
-        5. Mostrar Ranking  # Nueva opción para mostrar el ranking de jugadores
+        5. Mostrar Ranking
         6. Salir
         """ + Style.RESET_ALL)
         opcion = input(Fore.CYAN + "Elige una opción: " + Fore.WHITE)

@@ -1,4 +1,4 @@
-from peewee import Model, CharField, ForeignKeyField, AutoField
+from peewee import Model, CharField, ForeignKeyField, AutoField, IntegerField
 from .database import db
 
 # Clase base para todos los modelos
@@ -9,7 +9,9 @@ class BaseModel(Model):
 # Definición del modelo Jugador
 class Jugador(BaseModel):
     nombre = CharField(unique=True)  # Campo nombre único para cada jugador
-
+    victorias = IntegerField(default=0)  # Atributo que cuenta las victorias del jugador
+    partidas = IntegerField(default=0)  # Atributo que cuenta las partidas jugadas
+    
     class Meta:
         table_name = 'jugador'  # Nombre de la tabla en la base de datos
 

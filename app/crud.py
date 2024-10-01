@@ -11,12 +11,18 @@ def get_jugador_by_name(nombre: str) -> Jugador:
 
 # Crear una nueva partida con jugadores
 def create_partida(jugadores: list) -> Partida:
-    # Crear la partida
-    partida = Partida.create(puntajes='{}')
+    # Crear un diccionario de puntajes iniciales con los jugadores y sus puntajes en 0
+    puntajes_iniciales = {jugador.nombre: 0 for jugador in jugadores}
+    
+    # Crear la partida con puntajes iniciales
+    partida = Partida.create(puntajes=str(puntajes_iniciales))
+    
     # Relacionar los jugadores con la partida
     for jugador in jugadores:
         JugadoresPartidas.create(jugador=jugador, partida=partida)
+    
     return partida
+
 
 # Obtener una partida por su ID
 def get_partida_by_id(partida_id: int) -> Partida:
@@ -24,9 +30,14 @@ def get_partida_by_id(partida_id: int) -> Partida:
 
 # Actualizar los puntajes de una partida
 def update_puntajes(partida: Partida, nuevos_puntajes: dict) -> None:
-    partida.puntajes = str(nuevos_puntajes)
-    partida.save()
+    # Asegurarse de que nuevos_puntajes esté en el formato correcto
+    if isinstance(nuevos_puntajes, dict):
+        partida.puntajes = str(nuevos_puntajes)
+        partida.save()
+    else:
+        raise ValueError("nuevos_puntajes debe ser un diccionario válido.")
+
 
 # Obtener todos los jugadores
 def get_all_jugadores() -> List[Jugador]:
-    return list(Jugador.select())
+    return Jugador.select()

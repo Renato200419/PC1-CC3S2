@@ -69,6 +69,9 @@ def lanzar_dados(partida_id: int):
 
     puntajes = eval(partida.puntajes)  # Convertir el string a diccionario
     
+    # Obtener el ranking inicial de los jugadores antes de actualizar puntajes
+    ranking_inicial = {j.nombre: index + 1 for index, j in enumerate(get_all_jugadores().order_by(Jugador.victorias.desc()))}
+
     # Lógica para lanzar dados y acumular puntos
     for jugador in partida.jugadores:
         puntos = random.randint(1, 6)
@@ -89,7 +92,24 @@ def lanzar_dados(partida_id: int):
         jugador_ganador = get_jugador_by_name(ganador)  # Obtener el objeto del jugador ganador
         jugador_ganador.victorias += 1  # Incrementar el número de victorias del jugador
         jugador_ganador.save()  # Guardar los cambios en la base de datos
-        return {"mensaje": f"¡La partida ha terminado! El ganador es {ganador} con {puntajes[ganador]} puntos.", "puntajes": puntajes}
+
+        # Obtener el ranking final después de actualizar la partida
+        ranking_final = {j.nombre: index + 1 for index, j in enumerate(get_all_jugadores().order_by(Jugador.victorias.desc()))}
+
+        # Calcular el cambio de ranking para cada jugador involucrado en la partida
+        cambio_ranking = {
+            jugador.jugador.nombre: {
+                "posicion_inicial": ranking_inicial[jugador.jugador.nombre],
+                "posicion_final": ranking_final[jugador.jugador.nombre]
+            }
+            for jugador in partida.jugadores
+        }
+
+        return {
+            "mensaje": f"¡La partida ha terminado! El ganador es {ganador} con {puntajes[ganador]} puntos.",
+            "puntajes": puntajes,
+            "cambio_ranking": cambio_ranking  # Incluir el cambio de ranking en la respuesta
+        }
 
     # Actualizar los puntajes de la partida si aún no hay ganador
     update_puntajes(partida, puntajes)

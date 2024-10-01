@@ -44,11 +44,20 @@ def listar_jugadores():
 def crear_partida_endpoint(jugadores: List[Jugador]):
     if len(jugadores) < 2:
         raise HTTPException(status_code=400, detail="Se requieren al menos 2 jugadores")
-    # Crear jugadores si no existen y registrar la partida
-    jugador_objs = [get_jugador_by_name(j.nombre) or create_jugador(j.nombre) for j in jugadores]
+
+    # Verificar que todos los jugadores estén registrados previamente
+    jugador_objs = []
+    for j in jugadores:
+        jugador = get_jugador_by_name(j.nombre)
+        if not jugador:
+            raise HTTPException(status_code=400, detail=f"El jugador '{j.nombre}' no está registrado.")
+        jugador_objs.append(jugador)
+
+    # Crear la partida solo con jugadores ya registrados
     nueva_partida = create_partida(jugador_objs)
     partidas_counter.inc()  # Incrementar el contador de partidas
     return {"mensaje": f"Partida {nueva_partida.id} creada con éxito", "partida": nueva_partida}
+
 
 @router.post("/partidas/{partida_id}/lanzar")
 @latencia_histogram.time()  # Medir la latencia del endpoint

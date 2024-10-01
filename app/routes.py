@@ -66,14 +66,35 @@ def lanzar_dados(partida_id: int):
     partida = get_partida_by_id(partida_id)
     if not partida:
         raise HTTPException(status_code=404, detail="Partida no encontrada")
+
     puntajes = eval(partida.puntajes)  # Convertir el string a diccionario
+    
+    # Lógica para lanzar dados y acumular puntos
     for jugador in partida.jugadores:
         puntos = random.randint(1, 6)
         puntajes[jugador.jugador.nombre] = puntajes.get(jugador.jugador.nombre, 0) + puntos
+
         if puntos > 4:
             puntajes_histogram.observe(puntos)  # Agregar métrica para puntuaciones altas
+
+    # Verificar si algún jugador alcanzó el puntaje máximo (por ejemplo, 50 puntos)
+    ganador = None
+    for jugador, puntaje in puntajes.items():
+        if puntaje >= 50:  # Si el jugador alcanza 50 puntos o más
+            ganador = jugador
+            break
+
+    # Si hay un ganador, finalizar la partida y actualizar el contador de victorias del jugador
+    if ganador:
+        jugador_ganador = get_jugador_by_name(ganador)  # Obtener el objeto del jugador ganador
+        jugador_ganador.victorias += 1  # Incrementar el número de victorias del jugador
+        jugador_ganador.save()  # Guardar los cambios en la base de datos
+        return {"mensaje": f"¡La partida ha terminado! El ganador es {ganador} con {puntajes[ganador]} puntos.", "puntajes": puntajes}
+
+    # Actualizar los puntajes de la partida si aún no hay ganador
     update_puntajes(partida, puntajes)
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": puntajes}
+
 
 @router.get("/partidas/{partida_id}/estadisticas")
 def obtener_estadisticas(partida_id: int):
@@ -91,3 +112,13 @@ def reiniciar_partida(partida_id: int):
     puntajes = {jugador.jugador.nombre: 0 for jugador in partida.jugadores}
     update_puntajes(partida, puntajes)
     return {"mensaje": f"Partida {partida_id} reiniciada con éxito", "puntajes": puntajes}
+
+
+# Se agrega la ruta para el endpoint mostrar_ranking
+@router.get("/jugadores/ranking/")
+def mostrar_ranking():
+    # Obtener todos los jugadores y ordenarlos por victorias descendentes
+    jugadores = get_all_jugadores().order_by(Jugador.victorias.desc())
+    if not jugadores:
+        return {"mensaje": "No hay jugadores registrados."}
+    return {"ranking": [{"nombre": jugador.nombre, "victorias": jugador.victorias} for jugador in jugadores]}

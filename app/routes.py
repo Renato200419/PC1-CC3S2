@@ -53,29 +53,42 @@ def crear_partida_endpoint(jugadores: List[Jugador]):
             raise HTTPException(status_code=400, detail=f"El jugador '{j.nombre}' no está registrado.")
         jugador_objs.append(jugador)
 
-    # Crear la partida solo con jugadores ya registrados
+    # Inicializar puntajes con 0 para cada jugador
+    puntajes_iniciales = {jugador.nombre: 0 for jugador in jugador_objs}
+
+    # Crear la partida con puntajes iniciales
     nueva_partida = create_partida(jugador_objs)
+    nueva_partida.puntajes = str(puntajes_iniciales)
+    nueva_partida.save()  # Guardar la partida con los puntajes iniciales
+
     partidas_counter.inc()  # Incrementar el contador de partidas
     return {"mensaje": f"Partida {nueva_partida.id} creada con éxito", "partida": nueva_partida}
 
 
 @router.post("/partidas/{partida_id}/lanzar")
-@latencia_histogram.time()  # Medir la latencia del endpoint
+@latencia_histogram.time()
 def lanzar_dados(partida_id: int):
-    tiradas_counter.inc()  # Incrementar el contador de tiradas
+    tiradas_counter.inc()
     partida = get_partida_by_id(partida_id)
     if not partida:
         raise HTTPException(status_code=404, detail="Partida no encontrada")
 
-    puntajes = eval(partida.puntajes)  # Convertir el string a diccionario
-    
-    # Obtener el ranking inicial de los jugadores antes de actualizar puntajes
-    ranking_inicial = {j.nombre: index + 1 for index, j in enumerate(get_all_jugadores().order_by(Jugador.victorias.desc()))}
+    # Convertir el string a diccionario solo si no está vacío
+    puntajes = eval(partida.puntajes) if partida.puntajes else {}
+
+    # Obtener todos los jugadores y ordenarlos por sus victorias
+    jugadores = get_all_jugadores()
+    jugadores_ordenados = sorted(jugadores, key=lambda x: x.victorias, reverse=True)
+    ranking_inicial = {j.nombre: index + 1 for index, j in enumerate(jugadores_ordenados)}
+
+    # Depuración: Ver los valores de victorias para cada jugador
+    print(f"Jugadores con sus victorias: {[(j.nombre, j.victorias) for j in jugadores_ordenados]}")
 
     # Lógica para lanzar dados y acumular puntos
-    for jugador in partida.jugadores:
+    for jugador_partida in partida.jugadores:
+        jugador = jugador_partida.jugador  # Acceder al objeto `Jugador` a través de `jugador_partida`
         puntos = random.randint(1, 6)
-        puntajes[jugador.jugador.nombre] = puntajes.get(jugador.jugador.nombre, 0) + puntos
+        puntajes[jugador.nombre] = puntajes.get(jugador.nombre, 0) + puntos
 
         if puntos > 4:
             puntajes_histogram.observe(puntos)  # Agregar métrica para puntuaciones altas
@@ -89,16 +102,24 @@ def lanzar_dados(partida_id: int):
 
     # Si hay un ganador, finalizar la partida y actualizar el contador de victorias del jugador
     if ganador:
-        jugador_ganador = get_jugador_by_name(ganador)  # Obtener el objeto del jugador ganador
-        jugador_ganador.victorias += 1  # Incrementar el número de victorias del jugador
+        jugador_ganador = get_jugador_by_name(ganador)
+        jugador_ganador.victorias += 1
+        jugador_ganador.partidas += 1  # Incrementar el número de partidas jugadas por el jugador ganador
         jugador_ganador.save()  # Guardar los cambios en la base de datos
 
+        # Incrementar el contador de partidas jugadas para cada jugador
+        for jugador in partida.jugadores:
+            jugador.jugador.partidas += 1  # Incrementar el número de partidas jugadas para cada jugador
+            jugador.jugador.save()
+
+
         # Obtener el ranking final después de actualizar la partida
-        ranking_final = {j.nombre: index + 1 for index, j in enumerate(get_all_jugadores().order_by(Jugador.victorias.desc()))}
+        jugadores_ordenados = sorted(jugadores, key=lambda x: x.victorias, reverse=True)
+        ranking_final = {j.nombre: index + 1 for index, j in enumerate(jugadores_ordenados)}
 
         # Calcular el cambio de ranking para cada jugador involucrado en la partida
         cambio_ranking = {
-            jugador.jugador.nombre: {
+            jugador.jugador.nombre: {  # Acceder a `jugador.jugador.nombre`
                 "posicion_inicial": ranking_inicial[jugador.jugador.nombre],
                 "posicion_final": ranking_final[jugador.jugador.nombre]
             }
@@ -114,6 +135,7 @@ def lanzar_dados(partida_id: int):
     # Actualizar los puntajes de la partida si aún no hay ganador
     update_puntajes(partida, puntajes)
     return {"mensaje": f"Dados lanzados en la partida {partida_id}", "puntajes": puntajes}
+
 
 
 @router.get("/partidas/{partida_id}/estadisticas")
@@ -138,7 +160,16 @@ def reiniciar_partida(partida_id: int):
 @router.get("/jugadores/ranking/")
 def mostrar_ranking():
     # Obtener todos los jugadores y ordenarlos por victorias descendentes
-    jugadores = get_all_jugadores().order_by(Jugador.victorias.desc())
-    if not jugadores:
+    jugadores = get_all_jugadores()
+    
+    # Depuración: Asegúrate de que los jugadores obtenidos son instancias de `Jugador`
+    print(f"Jugadores obtenidos: {jugadores}")
+    
+    # Ordenar por victorias descendentes
+    jugadores_ordenados = sorted(jugadores, key=lambda j: j.victorias, reverse=True)
+    
+    if not jugadores_ordenados:
         return {"mensaje": "No hay jugadores registrados."}
-    return {"ranking": [{"nombre": jugador.nombre, "victorias": jugador.victorias} for jugador in jugadores]}
+
+    return {"ranking": [{"nombre": jugador.nombre, "victorias": jugador.victorias} for jugador in jugadores_ordenados]}
+

@@ -1,3 +1,9 @@
+# Sobre el documento
+
+Este documento cuenta con un índice para navegar de forma más cómoda. Previo al índice se tienen algunos enlaces de interés para facilitar la revisión del Docente.
+
+
+
 # Índice
 ## 1. Introducción
 - [1.1 Descripción del Proyecto](#descripción-del-proyecto)
@@ -23,6 +29,7 @@
   - [2.5.3 Consultas en Grafana](#253-consultas-en-grafana)
   - [2.5.4 Pasos para Configuración en Grafana y Prometheus](#254-pasos-para-configuración-en-grafana-y-prometheus)
   - [2.5.5 Finalización con Pull Request y Aceptación de Merge](#255-finalización-con-pull-request-y-aceptación-de-merge)
+  - [2.2.6 Versión final del Dashboard](#256-versión-final-dashboard-grafana)
 - [2.6 Contenerización y Gestión de Servicios](#26-contenerización-y-gestión-de-servicios)
   - [2.6.1 Estructura de los Servicios](#261-estructura-de-los-servicios)
   - [2.6.2 Configuración del Dockerfile y Docker Compose](#262-configuración-del-dockerfile-y-docker-compose)
@@ -37,7 +44,7 @@
   - [2.8.2 Objetivos de la Versión 2.0.0](#282-objetivos-de-la-versión-200)
   - [2.8.3 Cambios en la Estructura de la Aplicación](#283-cambios-en-la-estructura-de-la-aplicación)
   - [2.8.4 Retos y Próximos Pasos](#284-retos-y-próximos-pasos)
-  - [2.8.5 Estado Actual y Progreso]()
+  - [2.8.5 Planes Futuros](#28-planes-para-la-versión-200-del-proyecto)
 ## 3. Gestión del Proyecto con Git
 - [3.1 Flujo de Trabajo con GitHub Flow](#31-flujo-de-trabajo-con-github-flow)
   - [3.1.1 Estructura del Flujo de Trabajo](#311-estructura-del-flujo-de-trabajo)
@@ -46,7 +53,7 @@
 - [3.2 Resolución de Conflictos con `git mergetool`](#32-resolución-de-conflictos-con-git-mergetool)
 - [3.3 Uso de `cherry-pick`](#33-uso-de-cherry-pick)
 - [3.4 Revert y Squash](#34-uso-de-revert-y-squash)
-- [3.5 Reporte Detallado de Ramas y Commits](#35)
+- [3.5 Reporte Detallado de Ramas y Commits](#35-reporte-detallado-de-ramas-y-commits)
 
 ## 4. DevOps y DevSecOps
 - [4.1 Propósito](#41-prop%C3%B3sito)
@@ -455,21 +462,35 @@ Grafana se utiliza para visualizar las métricas recolectadas por Prometheus. He
   2. Ir a `Dashboards` > `Manage` > `Import`.
   3. Seleccionar el archivo JSON desde `metrics_dashboards/` y seguir las instrucciones para configurar la fuente de datos.
 
-### 2.5.2 Métricas Monitoreadas
+2.5.2 **Métricas Monitoreadas**
 
-Se están monitoreando varias métricas clave del juego de dados y del rendimiento de la API:
+Se están monitoreando varias métricas clave del juego de dados y del rendimiento de la API utilizando Prometheus. Cada métrica personalizada se utiliza para monitorear aspectos específicos del juego:
 
-#### Métricas Personalizadas
+#### **Métricas Personalizadas**
 
-Cada métrica personalizada se utiliza para monitorear aspectos específicos del juego:
+- **`jugadores_counter`**:  
+  - **Descripción**: Contador que registra el número total de jugadores que se han unido al juego.  
+  - **Propósito**: Ayuda a monitorear cuántos jugadores han sido registrados exitosamente en el sistema.
+  
+- **`partidas_counter`**:  
+  - **Descripción**: Contador que registra el número total de partidas creadas en el sistema.  
+  - **Propósito**: Permite realizar un seguimiento del número de partidas iniciadas, ayudando a identificar la actividad en el juego.
 
-- **tiradas_counter**: Contador que registra el número total de tiradas de dados realizadas en el juego.
-- **latencia_histogram**: Histograma que mide la latencia de las solicitudes a la API REST en segundos.
-- **jugadores_counter**: Contador que registra el número total de jugadores que se han unido al juego.
-- **partidas_counter**: Contador que registra el número total de partidas iniciadas y completadas.
-- **puntajes_histogram**: Histograma que muestra la distribución de puntajes alcanzados por los jugadores en las partidas.
+- **`tiradas_counter`**:  
+  - **Descripción**: Contador que registra el número total de tiradas de dados realizadas en el juego.  
+  - **Propósito**: Proporciona información sobre la cantidad de acciones realizadas por los jugadores, permitiendo evaluar la interacción en las partidas.
 
-En nuestra API REST tenemos el siguiente código:
+- **`latencia_histogram`**:  
+  - **Descripción**: Histograma que mide la latencia de las solicitudes a la API REST en segundos.  
+  - **Propósito**: Permite monitorear el rendimiento de la API y detectar posibles problemas de respuesta en las solicitudes.
+
+- **`puntuaciones_altas_counter`**:  
+  - **Descripción**: Contador que registra el número total de veces que se ha obtenido una puntuación alta (valor 6) en el lanzamiento de dados.  
+  - **Propósito**: Facilita el análisis de cuántas veces los jugadores logran obtener el valor máximo, lo que puede ayudar a entender la distribución de resultados y validar la aleatoriedad de los lanzamientos.
+
+#### **Ejemplo de Código para las Métricas en la API**
+
+En la implementación de la API REST se utilizan las siguientes métricas de Prometheus:
 
 ```python
 # Métricas de Prometheus
@@ -477,14 +498,11 @@ jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores
 partidas_counter = Counter("partidas_creadas_totales", "Total de partidas creadas")
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
-puntajes_histogram = Histogram("puntajes_altos", "Distribución de puntuaciones altas", buckets=[10, 20, 30, 40, 50, 60])
+puntuaciones_altas_counter = Counter("puntuaciones_altas", "Total de veces que se han obtenido puntuaciones altas (número 6)")
 ```
 
-#### Métricas Estándar (Prometheus FastAPI Instrumentation)
+Estas métricas se utilizan dentro de los endpoints para monitorear en tiempo real el comportamiento de la API y las acciones realizadas por los jugadores.
 
-- **http_requests_total**: Número total de solicitudes HTTP realizadas a la API, desglosadas por método y estado HTTP.
-- **process_resident_memory_bytes**: Uso de memoria del proceso.
-- **process_cpu_seconds_total**: Tiempo total de CPU consumido por el proceso.
 
 ### 2.5.3 Consultas en Grafana
 
@@ -535,6 +553,20 @@ rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
 4. Uno de los colaboradores acepta los cambios y se realiza el `merge`.
 
    ![Descripción de la imagen](Imagenes-obs/Foto11.png)
+
+### 2.5.6 Versión final Dashboard Grafana
+
+1. En Grafana configuramos un `data source` nuevo para nuestro **Dashboard final**. Se trata de postgreSQL
+
+    ![sql](Imagenes-obs/psql.png)
+
+2. Configuramos un nuevo panel para el top 5 según cantidad de victorias
+
+    ![tabla](Imagenes-obs/tabla.png)
+
+3. Añadimos más paneles con las métricas implementadas en nuestra versión final y observamos el resultado:
+
+   ![dashboard](Imagenes-obs/dashboard.png) 
 
 --- 
 

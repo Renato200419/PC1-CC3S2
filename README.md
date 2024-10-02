@@ -67,7 +67,7 @@ Una vez que accedes a la consola (`game_console.py`), sigue las instrucciones en
    - Ejemplo:
      ```
      Ingresa el ID de la partida para lanzar los dados: 1
-     Lanzando dados...D...D...D ¡Listo!
+     Lanzando dados......... ¡Listo!
      ¡La partida ha terminado! El ganador es Juan con 50 puntos.
      ```
 
@@ -99,9 +99,14 @@ Una vez que accedes a la consola (`game_console.py`), sigue las instrucciones en
 Para monitorear las métricas del juego:
 
 1. Accede a la interfaz de Grafana en `http://localhost:3000`.
-2. Importa el dashboard desde la carpeta `dashboards/` del proyecto:
-   - Ingresa a Grafana y selecciona la opción **Import** en la barra lateral.
-   - Carga el archivo JSON de la carpeta `dashboards/` que contiene la configuración del dashboard.
+2. Configura el Data Source en Grafana:
+   - En la barra lateral, selecciona Configuration y luego Data Sources.
+   - Crea un nuevo Data Source para Prometheus y establece la URL en http://prometheus:9090.
+   - Guarda la configuración.
+3. Importa el dashboard desde la carpeta dashboards/ del proyecto:
+   - En Grafana, selecciona la opción Import en la barra lateral.
+   - Carga el archivo JSON de la carpeta dashboards/ que contiene la configuración del dashboard.
+4. Una vez importado y configurado el Data Source, podrás ver las métricas
 
 ## Estructura del Proyecto
 

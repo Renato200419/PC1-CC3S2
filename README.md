@@ -8,7 +8,6 @@ El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que 
 
 - **API REST**: Implementada con FastAPI para gestionar jugadores, partidas y estadísticas.
 - **Cliente de Consola (`game_console.py`)**: Interfaz de línea de comandos para que los jugadores se registren, creen partidas, lancen dados y visualicen estadísticas de juego.
-- **Salas de Espera**: Los jugadores pueden unirse a salas antes de que las partidas comiencen.
 - **Monitoreo en Tiempo Real**: Configuración de Prometheus y Grafana para visualizar métricas y estadísticas del juego.
 - **DevSecOps Integrado**: Automatización de pruebas, auditoría de seguridad y análisis CI/CD.
 
@@ -22,8 +21,8 @@ El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que 
 
 1. Clona el repositorio del proyecto:
     ```bash
-    git clone https://github.com/usuario/proyecto-juego-dados.git
-    cd proyecto-juego-dados
+    git clone https://github.com/Renato200419/PC1-CC3S2.git
+    cd PC1-CC3S2
     ```
 
 2. Construye y levanta los servicios utilizando Docker Compose:
@@ -102,6 +101,19 @@ Para monitorear las métricas del juego:
 2. Configura el Data Source en Grafana:
    - En la barra lateral, selecciona Configuration y luego Data Sources.
    - Crea un nuevo Data Source para Prometheus y establece la URL en http://prometheus:9090.
+   - Crea un nuevo Data Source para PostgreSQL y se realiza la configuración:
+      * **Host URL:** `db:5432`
+      * **Database name:** `dadosdb`
+      * **Username:** `admin`
+      * **Password:** `configured`
+      * **TLS/SSL Mode:** `disable`
+      * **Version:** `13`
+      * **Min time interval:** `1m`
+      * **TimescaleDB:** 
+      * **Max open connections:** `100`
+      * **Auto max idle:**
+      * **Max idle connections:** `100`
+      * **Max connection lifetime:** `14400`      
    - Guarda la configuración.
 3. Importa el dashboard desde la carpeta dashboards/ del proyecto:
    - En Grafana, selecciona la opción Import en la barra lateral.
@@ -112,17 +124,19 @@ Para monitorear las métricas del juego:
 
 - **`app/`**: Implementación de la API REST y lógica del juego.
 - **`game_console.py`**: Cliente de consola para interactuar con el juego.
+- **`Dockerfile`**: Define la imagen Docker para la aplicación.
 - **`docker-compose.yml`**: Archivo de configuración para Docker Compose.
 - **`prometheus.yml`**: Configuración de Prometheus para la recolección de métricas.
-- **`dashboards/`**: Carpeta que contiene el archivo JSON del dashboard de Grafana.
 - **`audit.sh`**: Script para realizar auditorías de seguridad.
-- **`/Dashboard/`**: Configuraciones y paneles para visualizar métricas en Grafana.
+- **`Dashboard/`**: Carpeta que contiene el archivo JSON del dashboard de Grafana.
 - **`tests/`**: Pruebas unitarias y de integración para asegurar el correcto funcionamiento de la aplicación.
+- **`requirements.txt`**: Lista de dependencias de Python para el proyecto.
+
 
 ## Integrantes del Proyecto
-Jorge Alonso Barriga Morales
-Renato Steven Olivera Calderón
-José Ismael Llanos Rosadio
+- Jorge Alonso Barriga Morales
+- Renato Steven Olivera Calderón
+- José Ismael Llanos Rosadio
 
 ## Contribuciones
 

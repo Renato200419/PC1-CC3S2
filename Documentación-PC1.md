@@ -1,10 +1,40 @@
 # Sobre el documento
 
-Este documento cuenta con un índice para navegar de forma más cómoda. Previo al índice se tienen algunos enlaces de interés para facilitar la revisión del Docente.
+Este documento incluye un índice detallado que permite navegar por las secciones de manera rápida y eficiente. Además, se han creado enlaces directos a las secciones más relevantes para que el docente pueda acceder fácilmente a los puntos más importantes del trabajo de acorde a **"Rúbricas de evaluación para proyectos de juegos de consola"** en la **Parte I** y a los ejercicios del día Lunes 23/09 en la **Parte II**.
 
+## Enlaces de Interés según la Parte I
 
+- [1. Implementación técnica del juego](#2-desarrollo-del-proyecto)
+- [2. Aplicación de DevSecOps](#4-devops-y-devsecops-1)
+- [3. Contenerización e Infraestructura como Código (IaC)](#26-contenerización-y-gestión-de-servicios)
+- [4. Implementación de observabilidad (Prometheus y Grafana)](#25-observabilidad-y-monitorización)
+- [5. Aplicación de estrategias avanzadas de Git](#31-flujo-de-trabajo-con-github-flow)
+    * [Git mergetool](#32-resolución-de-conflictos-con-git-mergetool)
+    * [Git cherry-pick](#33-uso-de-cherry-pick)
+    * [Git revert y squash](#34-uso-de-revert-y-squash)
+- [6. Documentación y reflexión sobre el flujo de trabajo DevOps](#4-devops-y-devsecops-1)
+- [7. Uso correcto de Docker, Prometheus y Grafana](#254-pasos-para-configuración-en-grafana-y-prometheus)
 
-# Índice
+## Enlaces de Interés según la Parte II
+
+- [1. Implementación de la lógica de puntuación de dados en la API REST (3 puntos)](#22-estructura-de-la-api-rest)
+- [2. Monitorización de tiradas y puntuaciones con Prometheus (2 puntos)](#25-observabilidad-y-monitorización)
+- [3. Dockerización del juego de dados (3 puntos)](#26-contenerización-y-gestión-de-servicios)
+- [4. Simulación de partidas competitivas (3 puntos)](#27-cliente-de-consola)
+    * [Mejoras futuras (extra)](#28-planes-para-la-versión-200-del-proyecto)
+- [5. Resolución de conflictos de fusión con Git Mergetool (2 puntos)](#32-resolución-de-conflictos-con-git-mergetool)
+    * [Git cherry-pick (extra)](#33-uso-de-cherry-pick)
+    * [Git revert y squash (extra)](#34-uso-de-revert-y-squash)
+
+## Algunos enlaces extra
+
+- [1. Lista de Branches y commits](#35-reporte-detallado-de-ramas-y-commits)
+- [2. ¿Cómo manejamos las Branches?](#31-flujo-de-trabajo-con-github-flow)
+- [3. ¿Qué hicimos luego de la Parte I de la Práctica Calificada?](#5-cambios-clave-impulsados-por-la-inclusión-de-postgresql)
+- [4. ¿Qué nos gustaría mejorar o cuáles son nuestros planes a futuro para este proyecto?](#282-objetivos-de-la-versión-200)
+---
+
+# Índice Completo
 ## 1. Introducción
 - [1.1 Descripción del Proyecto](#descripción-del-proyecto)
 - [1.2 Objetivos](#objetivos)
@@ -36,9 +66,9 @@ Este documento cuenta con un índice para navegar de forma más cómoda. Previo 
   - [2.6.3 Ejecución del Proyecto con Docker Compose](#263-ejecución-del-proyecto-con-docker-compose)
   - [2.6.4 Uso de Volúmenes Persistentes](#264-uso-de-volúmenes-persistentes)
   - [2.6.5 Finalización con Pull Request y Aceptación de Merge](#265-finalización-con-pull-request-y-aceptación-de-merge)
-- [2.7 Simulación de Partidas Competitivas](#27-simulación-de-partidas-competitivas)
-  - [2.7.1 Cliente de Consola para Interacción](#271-cliente-de-consola-para-interacción)
-  - [2.7.2 Manejo de Estadísticas](#272-manejo-de-estadísticas)
+- [2.7 Cliente de Consola](#27-cliente-de-consola)
+  - [2.7.1 Descripción](#271-descripción-general)
+  - [2.7.2 Funcionalidades](#272-funcionalidades-del-cliente-de-consola)
 - [2.8 Planes para la Versión 2.0.0 del Proyecto](#28-planes-para-la-versión-200-del-proyecto)
   - [2.8.1 Descripción General](#281-descripción-general)
   - [2.8.2 Objetivos de la Versión 2.0.0](#282-objetivos-de-la-versión-200)
@@ -760,7 +790,7 @@ El cliente de consola permite a los usuarios interactuar con el juego de dados a
     - El usuario ingresa el ID de la partida para la cual se desean lanzar los dados. 
     - El cliente realiza una solicitud `POST` a la ruta `/partidas/{partida_id}/lanzar`.
     - Una vez lanzados los dados, se muestra una animación en la consola y se presentan los puntajes acumulados de cada jugador.
-    - Si se alcanza el puntaje de victoria (por ejemplo, 50 puntos), la partida finaliza y se declara un ganador. También se muestra el cambio en la posición de ranking de los jugadores involucrados en la partida.
+    - Si se alcanza el puntaje de victoria (por ejemplo, 50 puntos), la partida finaliza y se declara un ganador.
 
 4. **Mostrar Estadísticas**
     - El usuario ingresa el ID de la partida para la cual desea ver las estadísticas.
@@ -812,9 +842,6 @@ Ingresa el ID de la partida para lanzar los dados: 1
 Lanzando dados...D...D...D ¡Listo!
 ¡La partida ha terminado! El ganador es Juan con 50 puntos.
 Puntuaciones: {'Juan': 50, 'Ana': 30}
-=== ¡Cambios en la Clasificación! ===
-Juan: 2 -> 1
-Ana: 1 -> 2
 ```
 
 ---
@@ -1540,7 +1567,21 @@ A continuación, se presenta una lista detallada de todas las ramas creadas en e
 **Descripción**: Se añadieron nuevas funcionalidades a la consola del juego, incluyendo la gestión de rankings y estadísticas de jugadores. Se lanzó la versión **v1.1.0** del proyecto.
 
 ---
-### 38. **`feature/documentacion-pc1`**
+### 38. **`features/ajustes-metricas`**
+
+- **Cread por**: **Renato Steven Olivera Calderón**
+- **Fecha de Actualización**: **2024-10-02**
+- **Commits**:
+  - **e251a9c** (2024-10-02): *"Configurar métrica puntuaciones altas"* por **Renato Steven Olivera Calderón**
+  - **e1c40ef** (2024-10-02): *"Corregir línea de mensaje"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **b876726** (2024-10-02): *"Merge pull request #51 from Renato200419/features/ajustes-metricas"* realizado por **Jorge Barriga**
+
+**Descripción**: Se ajustaron y mejoraron las métricas avanzadas, específicamente la métrica de puntuaciones altas, optimizando su configuración y asegurando su correcto funcionamiento en el sistema de monitoreo.
+
+---
+
+### 39. **`feature/documentacion-pc1`**
 
 - **Creado por**: **Renato200419**
 - **Fecha de Creación**: **2024-09-27**
@@ -1555,6 +1596,10 @@ A continuación, se presenta una lista detallada de todas las ramas creadas en e
   - **712c845** (2024-09-29): *"Subir avance de la documentación de la gestión del proyecto con Git"* por **Renato200419**
   - **1bc3de7** (2024-09-30): *"Añadir imágenes para documentación"* por **Jorge Barriga**
   - **2c5f417** (2024-09-30): *"Actualización y mejora del documento"* por **Jorge Barriga**
+  - **ca2f020** (2024-10-02): *"Versión final README.md"* por **Jorge Barriga**
+  - **0742efa** (2024-10-02): *"Imágenes documentación"* por **Jorge Barriga**
+  - **02a7d02** (2024-10-02): *"Actualización sobre métricas e inclusión de nuevo índice"* por **Jorge Barriga**
+---
 
 **Descripción**: Se amplió y mejoró la documentación del proyecto, detallando el manejo de ramas y merges en el repositorio, y agregando información sobre Docker, Docker-Compose y PostgreSQL (Falta el último commit y el commit de merge pues no es posible saberlo).
 
@@ -1881,31 +1926,47 @@ Con la implementación de la base de datos:
 - **Consultas Eficientes**: Se pueden ejecutar consultas complejas sobre los datos almacenados de manera más eficiente usando SQL a través de `Peewee`.
 - **Facilidad para Reportes**: Permite generar estadísticas y reportes a partir de los datos almacenados de los jugadores y partidas.
 
-## 5.3 Monitorización de Tiradas y Puntuaciones con Prometheus
+## **5.3 Monitorización de Tiradas y Puntuaciones con Prometheus**
 
-### Contexto de la Monitorización
+### **Contexto de la Monitorización**
 
-La práctica calificada también incluyó la implementación de monitorización con **Prometheus** para capturar y analizar métricas clave del proyecto. Inicialmente, solo se monitoreaban el **número total de tiradas** y la **latencia de las solicitudes**. Se añadieron nuevas métricas para reflejar mejor el comportamiento de la API.
+La práctica calificada incluyó la implementación de monitorización con **Prometheus** para capturar y analizar métricas clave del proyecto. Inicialmente, solo se monitoreaban el **número total de tiradas** y la **latencia de las solicitudes**. Sin embargo, se añadieron nuevas métricas para reflejar mejor el comportamiento de la API y el juego en general, ofreciendo así una mayor visibilidad sobre el rendimiento y la interacción de los jugadores.
 
-### Nuevas Métricas Implementadas
+### **Nuevas Métricas Implementadas**
 
-1. **Contador de Jugadores (`jugadores_counter`)**:  
-   Registra cuántos jugadores han sido añadidos a la base de datos.
-   
-2. **Contador de Partidas (`partidas_counter`)**:  
-   Monitorea el número total de partidas creadas.
-   
-3. **Histograma de Puntuaciones (`puntajes_histogram`)**:  
-   Muestra la distribución de las puntuaciones alcanzadas por los jugadores durante el juego.
+1. **Contador de Jugadores (`jugadores_counter`)**  
+   Registra cuántos jugadores han sido añadidos a la base de datos. Se incrementa cada vez que se registra un nuevo jugador en el sistema.  
+   - **Propósito**: Facilita el monitoreo de la cantidad de jugadores activos en el sistema y la actividad general de los usuarios en la aplicación.
 
-### Resultados de la Monitorización
+2. **Contador de Partidas (`partidas_counter`)**  
+   Monitorea el número total de partidas creadas. Se incrementa cada vez que se inicia una nueva partida.  
+   - **Propósito**: Permite analizar cuántas partidas se están jugando y ayuda a evaluar la carga de trabajo del sistema.
+
+3. **Contador de Tiradas (`tiradas_counter`)**  
+   Registra cuántas veces se ha lanzado un dado en cualquier partida.  
+   - **Propósito**: Monitorea la cantidad de interacciones de los jugadores con el juego y permite ver la frecuencia de actividad.
+
+4. **Contador de Puntuaciones Altas (`puntuaciones_altas_counter`)**  
+   Registra cada vez que un jugador obtiene la puntuación máxima en un lanzamiento (valor 6).  
+   - **Propósito**: Facilita el análisis de la distribución de puntuaciones altas y ayuda a validar la aleatoriedad de los lanzamientos en el juego.
+
+5. **Histograma de Puntuaciones (`puntajes_histogram`)**  
+   Muestra la distribución de las puntuaciones alcanzadas por los jugadores durante el juego, agrupándolas en "buckets" o intervalos definidos.  
+   - **Propósito**: Proporciona información sobre el rendimiento de los jugadores y los valores de puntuación que se alcanzan con mayor frecuencia.
+
+6. **Histograma de Latencia de la API (`latencia_histogram`)**  
+   Mide la latencia de la API REST en segundos, registrando el tiempo que tarda la API en responder a cada solicitud.  
+   - **Propósito**: Monitorea el rendimiento de la API y ayuda a detectar problemas de latencia que podrían afectar la experiencia del usuario.
+
+### **Resultados de la Monitorización**
 
 Con la integración de estas métricas adicionales:
 
-- **Mayor Observabilidad**: Los gráficos en Grafana muestran en tiempo real la actividad de la API y el comportamiento de los jugadores.
-- **Monitoreo en Tiempo Real**: Se pueden observar patrones y tendencias en las puntuaciones y actividad del juego.
+- **Mayor Observabilidad**: Los gráficos en Grafana muestran en tiempo real la actividad de la API y el comportamiento de los jugadores. Las métricas de puntuación y tiradas permiten identificar patrones de juego y evaluar la aleatoriedad en los resultados.
+  
+- **Monitoreo en Tiempo Real**: Se pueden observar patrones y tendencias en las puntuaciones y la actividad del juego, lo que facilita la identificación de cuellos de botella o áreas de mejora en la experiencia de los jugadores.
 
-### Fragmento de Código para Métricas
+### **Fragmento de Código para Métricas**
 
 **Definición de Métricas en `routes.py`:**
 
@@ -1917,8 +1978,10 @@ jugadores_counter = Counter("jugadores_registrados_totales", "Total de jugadores
 partidas_counter = Counter("partidas_creadas_totales", "Total de partidas creadas")
 tiradas_counter = Counter("tiradas_totales", "Total de tiradas realizadas")
 latencia_histogram = Histogram("latencia_api", "Latencia de la API en segundos")
-puntajes_histogram = Histogram("puntajes_altos", "Distribución de puntuaciones altas", buckets=[10, 20, 30, 40, 50, 60])
+puntuaciones_altas_counter = Counter("puntuaciones_altas", "Total de veces que se han obtenido puntuaciones altas (número 6)")
 ```
+
+Estas métricas se han implementado dentro de los endpoints de la API para ofrecer un monitoreo en tiempo real del comportamiento de los jugadores y el rendimiento de la aplicación. La recolección de estas métricas se realiza mediante el uso de `Prometheus` y su visualización se lleva a cabo en `Grafana`, facilitando así el análisis detallado de las actividades en el sistema.
 
 ## 5.4 Cambios en las Pruebas Automáticas y su Impacto
 

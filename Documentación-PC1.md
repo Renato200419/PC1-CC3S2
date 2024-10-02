@@ -32,7 +32,12 @@
 - [2.7 Simulación de Partidas Competitivas](#27-simulación-de-partidas-competitivas)
   - [2.7.1 Cliente de Consola para Interacción](#271-cliente-de-consola-para-interacción)
   - [2.7.2 Manejo de Estadísticas](#272-manejo-de-estadísticas)
-
+- [2.8 Planes para la Versión 2.0.0 del Proyecto](#28-planes-para-la-versión-200-del-proyecto)
+  - [2.8.1 Descripción General](#281-descripción-general)
+  - [2.8.2 Objetivos de la Versión 2.0.0](#282-objetivos-de-la-versión-200)
+  - [2.8.3 Cambios en la Estructura de la Aplicación](#283-cambios-en-la-estructura-de-la-aplicación)
+  - [2.8.4 Retos y Próximos Pasos](#284-retos-y-próximos-pasos)
+  - [2.8.5 Estado Actual y Progreso]()
 ## 3. Gestión del Proyecto con Git
 - [3.1 Flujo de Trabajo con GitHub Flow](#31-flujo-de-trabajo-con-github-flow)
   - [3.1.1 Estructura del Flujo de Trabajo](#311-estructura-del-flujo-de-trabajo)
@@ -41,6 +46,7 @@
 - [3.2 Resolución de Conflictos con `git mergetool`](#32-resolución-de-conflictos-con-git-mergetool)
 - [3.3 Uso de `cherry-pick`](#33-uso-de-cherry-pick)
 - [3.4 Revert y Squash](#34-uso-de-revert-y-squash)
+- [3.5 Reporte Detallado de Ramas y Commits](#35)
 
 ## 4. DevOps y DevSecOps
 - [4.1 Propósito](#41-prop%C3%B3sito)
@@ -173,10 +179,49 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   }
   ```
 
-#### 2. **Crear Partida**
+#### 2. **Listar Jugadores**
+- **URL**: `/jugadores/`
+- **Método**: `GET`
+- **Descripción**: Lista todos los jugadores registrados en el sistema.
+- **Respuesta Exitosa (200)**:
+  ```json
+  {
+    "jugadores": ["nombre_jugador1", "nombre_jugador2"]
+  }
+  ```
+- **Mensaje de Error**:
+  - `200`: No hay jugadores registrados.
+  ```json
+  {
+    "mensaje": "No hay jugadores registrados"
+  }
+  ```
+
+#### 3. **Mostrar Ranking de Jugadores**
+- **URL**: `/jugadores/ranking/`
+- **Método**: `GET`
+- **Descripción**: Muestra el ranking de jugadores basado en el número de victorias.
+- **Respuesta Exitosa (200)**:
+  ```json
+  {
+    "ranking": [
+      {"nombre": "Juan", "victorias": 3},
+      {"nombre": "Ana", "victorias": 2}
+    ]
+  }
+  ```
+- **Mensaje de Error**:
+  - `200`: No hay jugadores registrados.
+  ```json
+  {
+    "mensaje": "No hay jugadores registrados"
+  }
+  ```
+
+#### 4. **Crear Partida**
 - **URL**: `/partidas/`
 - **Método**: `POST`
-- **Descripción**: Crea una nueva partida con al menos dos jugadores.
+- **Descripción**: Crea una nueva partida con al menos dos jugadores registrados.
 - **Solicitud**:
   ```json
   [
@@ -188,41 +233,29 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   ```json
   {
     "mensaje": "Partida 1 creada con éxito",
-    "partida": {
-      "id": 1,
-      "jugadores": [
-        {"nombre": "jugador1"},
-        {"nombre": "jugador2"}
-      ],
-      "puntajes": {
-        "jugador1": 0,
-        "jugador2": 0
-      }
-    }
+    "partida": {"id": 1, "puntajes": {"jugador1": 0, "jugador2": 0}}
   }
   ```
 - **Errores**:
-  - `400`: Se requieren al menos 2 jugadores.
+  - `400`: Error si hay menos de dos jugadores o si un jugador no está registrado.
   ```json
   {
     "detail": "Se requieren al menos 2 jugadores"
   }
   ```
 
-#### 3. **Lanzar Dados**
+#### 5. **Lanzar Dados en Partida**
 - **URL**: `/partidas/{partida_id}/lanzar`
 - **Método**: `POST`
-- **Descripción**: Lanza los dados en la partida y actualiza los puntajes de cada jugador.
-- **Parámetros**: 
-  - `partida_id` (int): ID de la partida.
+- **Descripción**: Lanza los dados para una partida específica, acumulando los puntos para cada jugador.
+- **Parámetros**:
+  - `partida_id`: ID de la partida para la cual se lanzarán los dados.
 - **Respuesta Exitosa (200)**:
   ```json
   {
-    "mensaje": "Dados lanzados en la partida 1",
-    "puntajes": {
-      "jugador1": 4,
-      "jugador2": 5
-    }
+    "mensaje": "¡La partida ha terminado! El ganador es Juan con 50 puntos.",
+    "puntajes": {"Juan": 50, "Ana": 30},
+    "cambio_ranking": {"Juan": {"posicion_inicial": 2, "posicion_final": 1}, "Ana": {"posicion_inicial": 1, "posicion_final": 2}}
   }
   ```
 - **Errores**:
@@ -233,20 +266,17 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   }
   ```
 
-#### 4. **Obtener Estadísticas**
+#### 6. **Obtener Estadísticas de la Partida**
 - **URL**: `/partidas/{partida_id}/estadisticas`
 - **Método**: `GET`
-- **Descripción**: Obtiene las estadísticas de una partida específica, incluyendo los puntajes de los jugadores.
+- **Descripción**: Muestra las estadísticas de una partida específica, incluyendo los puntajes de cada jugador.
 - **Parámetros**:
-  - `partida_id` (int): ID de la partida.
+  - `partida_id`: ID de la partida de la cual se desean ver las estadísticas.
 - **Respuesta Exitosa (200)**:
   ```json
   {
     "partida_id": 1,
-    "puntajes": {
-      "jugador1": 10,
-      "jugador2": 15
-    }
+    "puntajes": {"Juan": 50, "Ana": 30}
   }
   ```
 - **Errores**:
@@ -257,7 +287,28 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   }
   ```
 
-#### 5. **Root**
+#### 7. **Reiniciar Partida**
+- **URL**: `/partidas/{partida_id}/reiniciar`
+- **Método**: `POST`
+- **Descripción**: Reinicia una partida específica, restableciendo todos los puntajes a cero.
+- **Parámetros**:
+  - `partida_id`: ID de la partida que se desea reiniciar.
+- **Respuesta Exitosa (200)**:
+  ```json
+  {
+    "mensaje": "Partida 1 reiniciada con éxito",
+    "puntajes": {"Juan": 0, "Ana": 0}
+  }
+  ```
+- **Errores**:
+  - `404`: Partida no encontrada.
+  ```json
+  {
+    "detail": "Partida no encontrada"
+  }
+  ```
+
+#### 8. **Root**
 - **URL**: `/`
 - **Método**: `GET`
 - **Descripción**: Punto de entrada de la API. Devuelve un mensaje de bienvenida.
@@ -268,6 +319,7 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   }
   ```
 
+---
 ## 2.3 Explicación de Clases y Almacenamiento de Datos
 
 ### 2.3.1 Clases Definidas en `models.py`
@@ -276,36 +328,38 @@ La API permite gestionar partidas y jugadores en un juego de dados competitivo. 
   - Representa a un jugador registrado en el sistema.
   - Atributos:
     - `nombre` (str): Nombre único del jugador.
+    - `victorias` (int): Número de victorias obtenidas en partidas.
+    - `partidas` (int): Número de partidas jugadas.
 
   Ejemplo de representación:
   ```json
   {
-    "nombre": "Juan"
+    "nombre": "Juan",
+    "victorias": 3,
+    "partidas": 10
   }
   ```
 
 - **Partida**:
-  - Representa una partida de dados con su ID, jugadores y sus puntajes.
+  - Representa una partida de dados con su ID y puntajes de jugadores.
   - Atributos:
     - `id` (int): Identificador único de la partida.
-    - `puntajes` (dict): Diccionario que contiene los puntajes de cada jugador en la partida.
+    - `puntajes` (str): Diccionario en formato string que contiene los puntajes de cada jugador en la partida.
 
   Ejemplo de representación:
   ```json
   {
     "id": 1,
-    "puntajes": {
-      "Juan": 10,
-      "Pedro": 15
-    }
+    "puntajes": "{"Juan": 50, "Ana": 30}"
   }
   ```
 
 - **JugadoresPartidas**:
   - Relaciona a los jugadores con las partidas en las que han participado.
   - Atributos:
-    - `jugador` (ForeignKey): Referencia al jugador participante.
-    - `partida` (ForeignKey): Referencia a la partida en la que el jugador ha participado.
+    - `jugador` (ForeignKeyField): Referencia al jugador participante.
+    - `partida` (ForeignKeyField): Referencia a la partida en la que el jugador ha participado.
+
 
 ### 2.3.2 Almacenamiento de Datos
 
@@ -653,62 +707,128 @@ volumes:
    ![Descripción de la imagen](Imagenes/Imagen.png)
 
 ---
-## 2.7 Documentación del Cliente de Consola
-### Propósito
-Este documento proporciona una guía detallada sobre cómo instalar, ejecutar y utilizar el cliente de consola para el juego de dados competitivo. El cliente permite a los jugadores unirse a partidas, lanzar dados y consultar estadísticas a través de la terminal.
-### Instrucciones de Instalación y Ejecución
-#### Requisitos Previos
-- **Python**: Debe estar instalado en tu sistema (versión 3.x recomendada).
-- **Dependencias**: Asegúrate de tener las dependencias del proyecto especificadas en `requirements.txt`.
-#### Instalación
-1. **Clonar el Repositorio**: Si aún no lo has hecho, clona el repositorio del proyecto:
-   ```bash
-   git clone https://github.com/usuario/juego-dados-competitivo.git
-   ```
-2. **Navegar al Directorio del Proyecto**:
-   ```bash
-   cd juego-dados-competitivo
-   ```
-3. **Instalar Dependencias**: Instala las dependencias necesarias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-#### Ejecución
-Para iniciar el cliente de consola y comenzar a jugar:
-1. **Ejecutar el Cliente**:
-   ```bash
-   python game_console.py
-   ```
-### Guía de Uso
-#### Unirse a una Partida
-1. Al iniciar el cliente, se te pedirá ingresar tu nombre y el nombre de la partida a la que deseas unirte.
-2. Introduce los datos solicitados y presiona Enter.
-#### Lanzar Dados
-1. Dentro de una partida, puedes lanzar los dados utilizando el comando de lanzamiento cuando se te indique.
-2. El cliente mostrará el resultado del lanzamiento y actualizará la puntuación.
-#### Ver Estadísticas
-1. Para consultar las estadísticas de la partida actual, utiliza el comando correspondiente en el cliente.
-2. El cliente te proporcionará información sobre la puntuación actual y otras métricas relevantes.
-### Ejemplos de Uso
-#### Unirse a una Partida
+## **2.7 Cliente de Consola**
+
+### **2.7.1 Descripción General**
+
+El cliente de consola permite a los usuarios interactuar con el juego de dados a través de comandos de texto. Utiliza la API para registrar jugadores, crear partidas, lanzar dados, consultar estadísticas de las partidas y visualizar el ranking de jugadores. La interfaz ha sido diseñada para ser intuitiva y proporcionar una experiencia agradable mediante el uso de colores.
+
+### **2.7.2 Funcionalidades del Cliente de Consola**
+
+1. **Registrar Jugador**
+    - El usuario ingresa el nombre del jugador y el cliente realiza una solicitud `POST` a la ruta `/jugadores/` de la API para registrar al jugador en el sistema.
+    - Si el registro es exitoso, se muestra un mensaje de confirmación en verde. En caso de error, se muestra un mensaje en rojo indicando que el jugador ya está registrado.
+
+2. **Crear Partida**
+    - El cliente solicita al usuario que ingrese el número de jugadores y luego los nombres de cada uno. 
+    - Se realiza una solicitud `POST` a la ruta `/partidas/` de la API para crear la partida.
+    - Si la partida se crea con éxito, se muestra un mensaje con el ID de la partida. Si ocurre un error, se informa al usuario.
+
+3. **Lanzar Dados**
+    - El usuario ingresa el ID de la partida para la cual se desean lanzar los dados. 
+    - El cliente realiza una solicitud `POST` a la ruta `/partidas/{partida_id}/lanzar`.
+    - Una vez lanzados los dados, se muestra una animación en la consola y se presentan los puntajes acumulados de cada jugador.
+    - Si se alcanza el puntaje de victoria (por ejemplo, 50 puntos), la partida finaliza y se declara un ganador. También se muestra el cambio en la posición de ranking de los jugadores involucrados en la partida.
+
+4. **Mostrar Estadísticas**
+    - El usuario ingresa el ID de la partida para la cual desea ver las estadísticas.
+    - El cliente realiza una solicitud `GET` a la ruta `/partidas/{partida_id}/estadisticas` para obtener los puntajes de cada jugador en la partida.
+    - Se muestran los puntajes actuales de todos los jugadores.
+
+5. **Mostrar Ranking**
+    - El cliente realiza una solicitud `GET` a la ruta `/jugadores/ranking/` para obtener el ranking de jugadores basado en el número de victorias.
+    - Los jugadores se listan de acuerdo a sus victorias en orden descendente. Si no hay jugadores registrados, se muestra un mensaje informativo.
+
+6. **Salir**
+    - Permite al usuario salir del juego y finalizar la ejecución del cliente de consola.
+
+### **2.7.3 Estructura de las Funciones**
+
+A continuación se describen las principales funciones implementadas en el cliente de consola:
+
+- **`registrar_jugador()`**: Registra un nuevo jugador solicitando el nombre y utilizando la API. Muestra mensajes en la consola indicando el éxito o el fallo del registro.
+
+- **`crear_partida()`**: Crea una nueva partida con los jugadores indicados. Solicita el número de jugadores y los nombres de cada uno antes de enviar la solicitud a la API.
+
+- **`lanzamiento_animado()`**: Muestra una animación de lanzamiento de dados en la consola para hacer la experiencia más visual.
+
+- **`lanzar_dados()`**: Lanza los dados para una partida específica. Solicita el ID de la partida, muestra los puntajes acumulados y, si la partida ha terminado, muestra el cambio de ranking de los jugadores.
+
+- **`mostrar_estadisticas()`**: Muestra las estadísticas de una partida específica, incluyendo los puntajes de cada jugador.
+
+- **`mostrar_ranking()`**: Muestra el ranking global de jugadores basado en el número de victorias.
+
+- **`menu_principal()`**: Muestra el menú principal del juego con las opciones disponibles y gestiona la navegación entre las funciones del cliente.
+
+### **2.7.4 Ejemplo de Uso del Cliente de Consola**
+
+A continuación se muestra un ejemplo de uso del cliente de consola:
+
+```bash
+==============================
+    Menú Principal del Juego
+==============================
+1. Registrar Jugador
+2. Crear Partida
+3. Lanzar Dados
+4. Mostrar Estadísticas
+5. Mostrar Ranking
+6. Salir
+
+Elige una opción: 3
+Ingresa el ID de la partida para lanzar los dados: 1
+Lanzando dados...D...D...D ¡Listo!
+¡La partida ha terminado! El ganador es Juan con 50 puntos.
+Puntuaciones: {'Juan': 50, 'Ana': 30}
+=== ¡Cambios en la Clasificación! ===
+Juan: 2 -> 1
+Ana: 1 -> 2
 ```
-> python main.py
-Ingrese su nombre: Juan
-Ingrese el nombre de la partida: Partida1
-```
-#### Lanzar Dados
-```
-> lanzar dados
-Resultado: 4, 5
-```
-#### Ver Estadísticas
-```
-> ver estadísticas
-Puntuación Actual: 9
-```
-### Solución de Problemas
-- **No se puede conectar al servidor**: Verifica que los servicios de la API estén funcionando y que tu red esté correctamente configurada.
-- **Errores de dependencia**: Asegúrate de haber instalado todas las dependencias mencionadas en `requirements.txt`.
+
+---
+### **2.8 Planes para la Versión 2.0.0 del Proyecto**
+
+#### **2.8.1 Descripción General**
+
+La versión 2.0.0 del proyecto de juego de dados competitivo se centra en la transición de la aplicación a un sistema cliente-servidor para permitir una experiencia multijugador real. Esta nueva versión se diseñará para ofrecer una mayor independencia a cada jugador durante el transcurso de las partidas, así como mejorar la gestión de partidas y la interactividad del juego.
+
+#### **2.8.2 Objetivos de la Versión 2.0.0**
+
+1. **Implementar la Consola de Jugadores:**
+   - En esta versión, se separará la consola de administración actual (`game_console.py`) de la consola de jugadores, creando una nueva consola destinada exclusivamente a las interacciones de los jugadores.
+   - Los jugadores podrán registrarse, crear y unirse a salas, y participar en partidas de forma independiente.
+
+2. **Estructura de Salas y Partidas:**
+   - Las partidas no se iniciarán de inmediato cuando los jugadores se unan. En su lugar, se crearán salas de espera donde los jugadores se podrán unir hasta alcanzar el número máximo configurado para cada partida.
+   - Una vez que una sala alcanza el número máximo de jugadores, la partida se iniciará automáticamente, permitiendo a los jugadores competir con un flujo de juego más dinámico y ordenado.
+
+3. **Modos de Juego:**
+   - En esta versión, se planea incluir configuraciones para diferentes modos de juego. El modo "Competitivo" será el primero en implementarse, pero se tiene contemplado explorar otros modos, como "Cooperativo" y "Eliminación Directa", en futuras actualizaciones.
+   - En los nuevos modos de juego también se planea incluir la opción de activar modificadores especiales en la partida, algunos ejemplos son: "Puntuaciones dobles", donde los jugadores pueden elegir en qué turno activar un multiplicador de puntos; "Robo de puntos", que activa la habilidad de robarle los puntos a un jugador en el turno actual; "Intercambio de puntos", que intercambia el puntaje que obtienen dos jugadores en un turno; entre otros.
+
+4. **Límites de Tiempo por Turno:**
+   - Se establecerá un límite de tiempo por turno (15 segundos), lo cual añade un componente estratégico a la toma de decisiones en cada lanzamiento de dados. Los jugadores deberán pensar rápidamente y actuar antes de que se agote el tiempo.
+
+5. **Integración de Métricas de Monitoreo:**
+   - Continuar con la integración de Prometheus y Grafana para monitorear el rendimiento y la actividad de la API en tiempo real. Se añadirán nuevas métricas como:
+     - *Tiempo de respuesta promedio por solicitud de jugador.*
+     - *Número de jugadores activos en salas.*
+     - *Cantidad de partidas finalizadas exitosamente.*
+
+#### **2.8.3 Cambios en la Estructura de la Aplicación**
+
+- **Endpoints y Funcionalidades:**
+  - Los endpoints de la API se mantendrán, pero se realizarán ajustes para soportar la nueva estructura de salas y turnos. Se espera añadir rutas adicionales para gestionar la creación y eliminación de salas, así como la administración de los turnos de cada jugador.
+
+- **Modelo de Datos:**
+  - Se contempla la incorporación de un nuevo modelo llamado `Sala` para gestionar la información de cada sala de espera y su asociación con los jugadores.
+
+- **Interacción en la Consola:**
+  - La consola de jugadores ofrecerá un menú interactivo con opciones para:
+    - *Registrarse o iniciar sesión.*
+    - *Unirse a salas existentes o crear nuevas salas.*
+    - *Participar en partidas, visualizando su turno y lanzando los dados cuando sea su turno.*
+  - Los jugadores recibirán mensajes en la consola informando sobre los cambios en la sala, como la entrada de nuevos jugadores o el inicio de la partida.
 
 ---
 
@@ -874,266 +994,540 @@ La situación presentada fue la siguiente:
 Finalmente, se logró solucionar el problema y estabilizar la aplicación, aunque no se detallan los pasos exactos aquí, ya que no es el objetivo principal de esta sección. Lo importante fue aprender a utilizar estas herramientas para corregir errores de integración y consolidar el historial de commits.
 ## 3.5 Reporte Detallado de Ramas y Commits
 
-### 1. **Commit Inicial (hace 7 días)**
-- **dd52aed**: *"Initial commit: added README and .gitignore"* por **Jorge Barriga**.
-- **Descripción**: Se estableció la base del repositorio con los archivos iniciales necesarios.
+### Reporte Detallado del Manejo de Branches en Orden Cronológico
+
+A continuación, se presenta una lista detallada de todas las ramas creadas en el proyecto, ordenadas cronológicamente según su fecha de creación. Para cada rama, se incluyen los detalles de los commits realizados, fechas, autores, merges y descripciones.
 
 ---
-### 2. **Creación y Merge de `feature/estructura-basica`**
-- **Branch**: `feature/estructura-basica` creado por **Renato200419**.
-- **Commits en la rama**:
-  - **6fff542**: *"Se sube la estructura básica del Juego"* por **Renato200419**.
-- **Merge**:
-  - **Commit**: **d89b1f1**
-  - **Acción**: Merge del pull request #1 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se añadió la estructura fundamental del juego, estableciendo las bases para el desarrollo posterior.
+### 1. **`main`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-20**
+- **Commit Inicial**:
+  - **dd52aed** (2024-09-20): *"Initial commit: added README and .gitignore"* por **Jorge Barriga**
+
+**Descripción**: Se estableció el repositorio inicial del proyecto, agregando los archivos base `README.md` y `.gitignore`.
 
 ---
-### 3. **Creación y Merge de `feature/docker-setup`**
-- **Branch**: `feature/docker-setup` creado por **Renato200419**.
-- **Commits en la rama**:
-  - **2d1ba9f**: *"Subir Dockerfile"* por **Renato200419**.
-  - **cb0b4c7**: *"Se configuró el puerto en main.py"* por **Renato200419**.
-- **Merge**:
-  - **Commit**: **9d712f4**
-  - **Acción**: Merge del pull request #2 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se añadió el Dockerfile y se configuró el puerto en `main.py` para facilitar la implementación en contenedores.
+### 2. **`feature/estructura-basica`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-20**
+- **Commits**:
+  - **6fff542** (2024-09-20): *"Se sube la estructura básica del Juego"* por **Renato200419**
+- **Merge a `main`**:
+  - **d89b1f1** (2024-09-20): *"Merge pull request #1 from Renato200419/feature/estructura-basica"* realizado por **Jorge Barriga**
+
+**Descripción**: Se añadió la estructura fundamental del juego, estableciendo las bases para el desarrollo posterior.
 
 ---
-### 4. **Creación y Merge de `feature/api`**
-- **Branch**: `feature/api` creado por **Jorge Barriga**.
-- **Commits en la rama**:
-  - **fd31007**: *"Añadir class Jugador y la ruta para registrar jugadores"* por **Jorge Barriga**.
-  - **1470329**: *"Añadir class Partida y la ruta para crear nuevas partidas"* por **Jorge Barriga**.
-  - **34885ba**: *"Implementar la ruta para lanzar dados en una partida"* por **Jorge Barriga**.
-  - **9d92e9b**: *"Reordenar y limpiar el código para mejorar legibilidad"* por **Jorge Barriga**.
-  - **15b2918**: *"Implementar ruta para consultar estadísticas de partidas"* por **Jorge Barriga**.
-- **Merge**:
-  - **Commit**: **8850d17**
-  - **Acción**: Merge del pull request #3 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se desarrollaron las rutas principales de la API, incluyendo funcionalidades para jugadores y partidas.
+### 3. **`feature/docker-setup`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-20**
+- **Commits**:
+  - **2d1ba9f** (2024-09-20): *"Subir Dockerfile"* por **Renato200419**
+  - **cb0b4c7** (2024-09-20): *"Se configuró el puerto en main.py"* por **Renato200419**
+- **Merge a `main`**:
+  - **9d712f4** (2024-09-20): *"Merge pull request #2 from Renato200419/feature/docker-setup"* realizado por **Jorge Barriga**
+
+**Descripción**: Se añadió el Dockerfile y se configuró el puerto en `main.py` para facilitar el despliegue de la aplicación en contenedores Docker.
 
 ---
-### 5. **Actualización y Merge de `feature/docker-setup`**
-- **Actualización de la rama** por **Renato200419**.
+### 4. **`feature/api`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-20**
+- **Commits**:
+  - **fd31007** (2024-09-20): *"Añadir class Jugador y la ruta para registrar jugadores"* por **Jorge Barriga**
+  - **1470329** (2024-09-20): *"Añadir class Partida y la ruta para crear nuevas partidas"* por **Jorge Barriga**
+  - **34885ba** (2024-09-20): *"Implementar la ruta para lanzar dados en una partida"* por **Jorge Barriga**
+  - **9d92e9b** (2024-09-20): *"Reordenar y limpiar el código para mejorar legibilidad"* por **Jorge Barriga**
+  - **15b2918** (2024-09-20): *"Implementar ruta para consultar estadísticas de partidas"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **8850d17** (2024-09-20): *"Merge pull request #3 from Renato200419/feature/api"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se desarrollaron las rutas principales de la API utilizando FastAPI, incluyendo funcionalidades para registrar jugadores, crear partidas, lanzar dados y consultar estadísticas.
+
+---
+### 5. **`feature/devsecops`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-20**
+- **Commit**:
+  - **6cc559f** (2024-09-20): *"Configuración de GitHub Workflows"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **d809ba9** (2024-09-20): *"Merge pull request #5 from Renato200419/feature/devsecops"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se configuraron los flujos de trabajo de GitHub Actions para integrar prácticas de DevSecOps en el proyecto, incluyendo integraciones continuas y análisis de seguridad.
+
+---
+### 6. **`fix/ci-pipeline`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-20**
+- **Commits**:
+  - **e799c19** (2024-09-20): *"Agregar CI pipeline para pruebas en GitHub Actions"* por **al-2100**
+  - **ef939f7** (2024-09-20): *"Test en branch /fix/ci-pipeline"* por **Jorge Barriga**
+  - **daa0434** (2024-09-20): *"Test en branch /fix/ci-pipeline"* por **Jorge Barriga**
+  - **0672469** (2024-09-20): *"Agregar requirements.txt con dependencias del proyecto"* por **Jorge Barriga**
+  - **2956a17** (2024-09-20): *"Retirar tests (temporalmente)"* por **Jorge Barriga**
+  - **c6bd1f4** (2024-09-20): *"Retirar fix/ci-pipeline del pipeline CI"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **72fd1f1** (2024-09-20): *"Merge pull request #6 from Renato200419/fix/ci-pipeline"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se solucionaron problemas en el pipeline de integración continua, asegurando que las pruebas automáticas se ejecuten correctamente en GitHub Actions.
+
+---
+### 7. **`feature/interfaz-crear_partida`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-21**
+- **Commit**:
+  - **988a08b** (2024-09-21): *"Se agrega la función crear-partida"* por **Renato200419**
+- **Merge a `feature/interfaz`**:
+  - **61098d2** (2024-09-21): *"Merge pull request #9 from Renato200419/feature/interfaz-crear_partida"* realizado por **ISMA12345830**
+
+**Descripción**: Se añadió la función para crear partidas en la interfaz de consola del juego.
+
+---
+### 8. **`feature/interfaz-mostrar_estadisticas`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-21**
+- **Commit**:
+  - **f26e094** (2024-09-21): *"Se agrega la función mostrar estadisticas"* por **ISMA12345830**
+- **Merge a `feature/interfaz`**:
+  - **cf0936d** (2024-09-21): *"Merge pull request #10 from Renato200419/feature/interfaz-mostrar_estadisticas"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se implementó la función para mostrar estadísticas de las partidas en la interfaz de consola.
+
+---
+### 9. **`feature/interfaz`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-21**
+- **Commits**:
+  - **c95e6e3** (2024-09-22): *"Se agregan más funciones para la interfaz consola: lanzar_dados y registrar_jugador"* por **Renato200419**
+  - **48ea60b** (2024-09-22): *"Se agregó el menú principal"* por **ISMA12345830**
+- **Merge a `main`**:
+  - **9852026** (2024-09-22): *"Merge pull request #11 from Renato200419/feature/interfaz"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se consolidaron las funciones de creación de partida, registro de jugadores, lanzamiento de dados y visualización de estadísticas en la interfaz de consola.
+
+---
+### 10. **`feature/pruebas`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-22**
+- **Commit**:
+  - **6ab1738** (2024-09-22): *"Configurar pruebas básicas en test_app.py"* por **ISMA12345830**
+- **Merge a `main`**:
+  - **06cb580** (2024-09-22): *"Merge pull request #13 from Renato200419/feature/pruebas"* realizado por **Jorge Barriga**
+
+**Descripción**: Se añadieron pruebas unitarias básicas para validar las funcionalidades principales de la aplicación.
+
+---
+### 11. **`feature/actualizar-ci`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-22**
+- **Commits**:
+  - **708f593** (2024-09-22): *"Modificar ci.yml para incluir CD de CI/CD"* por **ISMA12345830**
+  - **4dc7276** (2024-09-22): *"Correcciones a ci.yml"* por **ISMA12345830**
+  - **3d68ab0** (2024-09-22): *"Actualizar dependencias"* por **ISMA12345830**
+  - **63a2071** (2024-09-22): *"Corregir pipeline"* por **ISMA12345830**
+  - **a57ef67** (2024-09-22): *"Arreglar el error de indentación"* por **ISMA12345830**
+  - **f29092b** (2024-09-22): *"Cambios a versiones"* por **ISMA12345830**
+  - **a513ece** (2024-09-22): *"Cambiar a test con testclient"* por **ISMA12345830**
+  - **08ed653** (2024-09-22): *"Establecer PYTHONPATH"* por **Jorge Barriga**
+  - **c3660b9** (2024-09-22): *"Incluir la actualización de setuptools"* por **Jorge Barriga**
+  - **69efee7** (2024-09-22): *"Eliminar Run API tests"* por **Jorge Barriga**
+  - **d092361** (2024-09-22): *"Eliminar feature/actualizar-ci de 'on push'"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **4fb7d3f** (2024-09-22): *"Merge pull request #16 from Renato200419/feature/actualizar-ci"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se actualizó el pipeline de CI/CD para mejorar la integración y despliegue continuo, incluyendo ajustes en las versiones y dependencias.
+
+---
+### 12. **`prometheus-config`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-22**
+- **Commit**:
+  - **234ef9a** (2024-09-22): *"Crear prometheus.yml"* por **Renato200419**
+- **Merge a `main`**:
+  - **6199f8f** (2024-09-22): *"Merge pull request #14 from Renato200419/prometheus-config"* realizado por **ISMA12345830**
+
+**Descripción**: Se añadió la configuración inicial de Prometheus para la recolección de métricas.
+
+---
+### 13. **`feature/docker-setup`**
+
+- **Commits**:
+  - **ed971b5** (2024-09-22): *"Actualizar docker-compose.yml para incluir Prometheus y Grafana"* por **Renato200419**
+- **Merge a `main`**:
+  - **7102deb** (2024-09-22): *"Merge pull request #15 from Renato200419/feature/docker-setup"* realizado por **ISMA12345830**
+
+**Descripción**: Se actualizó el archivo `docker-compose.yml` para integrar los servicios de Prometheus y Grafana, permitiendo la monitorización y visualización de métricas.
+
+---
+### 14. **`feature/metrics`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-22**
+- **Commits**:
+  - **a93f901** (2024-09-22): *"Agregar prometheus_fastapi_instrumentator y prometheus_client"* por **Renato200419**
+  - **95d2fdb** (2024-09-22): *"Modificar app.py para incluir métricas de tiradas y latencia"* por **Renato200419**
+  - **064b019** (2024-09-22): *"Agregar dependencias a requirements.txt"* por **Renato200419**
+  - **aa19308** (2024-09-22): *"Actualizar la forma en la que se instalan las dependencias"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **aa710ce** (2024-09-22): *"Merge pull request #19 from Renato200419/feature/metrics"* realizado por **Jorge Barriga**
+
+**Descripción**: Se implementaron métricas personalizadas para la aplicación, incluyendo métricas de tiradas de dados y latencia de endpoints.
+
+---
+### 15. **`fix-missing-metrics`**
+
+- **Creado por**: **Renato Steven Olivera Calderón**
+- **Fecha de Creación**: **2024-09-22**
+- **Commits**:
+  - **440826f** (2024-09-22): *"Agregar prometheus_fastapi_instrumentator y prometheus_client"* por **Renato200419**
+  - **63d03bc** (2024-09-22): *"Modificar app.py para incluir métricas de tiradas y latencia"* por **Renato200419**
+  - **ca01784** (2024-09-22): *"Agregar dependencias a requirements.txt"* por **Renato200419**
+  - **bd8a7eb** (2024-09-22): *"Actualizar la forma en la que se instalan las dependencias"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **33876ee** (2024-09-22): *"Merge pull request #20 from Renato200419/fix-missing-metrics"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se corrigieron problemas relacionados con la falta de ciertas métricas en la aplicación.
+
+---
+### 16. **`feature/configurar-prometheus-grafana`**
+
+- **Creado por**: **Renato Steven Olivera Calderón**
+- **Fecha de Creación**: **2024-09-22**
+- **Commits**:
+  - **9429051** (2024-09-22): *"Actualización del docker-compose para almacenar datos"* por **Renato Steven Olivera Calderón**
+  - **08cbbad** (2024-09-22): *"Dashboard creado"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **ab3261f** (2024-09-22): *"Merge pull request #21 from Renato200419/feature/configurar-prometheus-grafana"* realizado por **Jorge Barriga**
+
+**Descripción**: Se configuraron Prometheus y Grafana para almacenar datos de métricas de forma persistente y se creó un dashboard personalizado.
+
+---
+### 17. **`feature/documentation-docker`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-22**
+- **Commits**:
+  - **572a11f** (2024-09-22): *"Subir documentación Docker.md"* por **Renato200419**
+  - **038f3ef** (2024-09-22): *"Subir carpeta que contiene la imagen(es) para la documentación"* por **Renato200419**
+  - **e15afa1** (2024-09-22): *"Corrección de línea"* por **Renato200419**
+- **Merge a `main`**:
+  - **ce81973** (2024-09-22): *"Merge pull request #22 from Renato200419/feature/documentation-docker"* realizado por **Jorge Barriga**
+
+**Descripción**: Se añadió documentación detallada sobre la configuración y uso de Docker en el proyecto.
+
+---
+### 18. **`feature/documentation-observability`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-23**
+- **Commits**:
+  - **2b86073** (2024-09-23): *"Se agrega el archivo Markdown que explica la Observabilidad en el proyecto"* por **Renato200419**
+  - **b9233f6** (2024-09-23): *"Se agrega la carpeta Imágenes que se usará para la documentación"* por **Renato200419**
+- **Merge a `main`**:
+  - **fb5b4ea** (2024-09-23): *"Merge pull request #23 from Renato200419/feature/documentation-observability"* realizado por **Jorge Barriga**
+
+**Descripción**: Se documentó la implementación de observabilidad en el proyecto, incluyendo el uso de Prometheus y Grafana.
+
+---
+### 19. **`feature/documentation-git-usage`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-23**
+- **Commits**:
+  - **6a996a7** (2024-09-23): *"Subir documentación del uso de Git y resolución de conflictos"* por **Renato200419**
+  - **1f587c1** (2024-09-23): *"Subir carpeta de Imágenes que se usarán en la documentación"* por **Renato200419**
+- **Merge a `main`**:
+  - **66ef939** (2024-09-23): *"Merge pull request #24 from Renato200419/feature/documentation-git-usage"* realizado por **Jorge Barriga**
+
+**Descripción**: Se añadió documentación sobre buenas prácticas en el uso de Git y cómo resolver conflictos durante el desarrollo colaborativo.
+
+---
+### 20. **`feature/documentation-devsecops`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-23**
+- **Commits**:
+  - **cad829d** (2024-09-23): *"Subir imágenes para documentación DevSecOps"* por **Jorge Barriga**
+  - **97723af** (2024-09-23): *"Documentación DevSecOps"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **0d0e220** (2024-09-23): *"Merge pull request #25 from Renato200419/feature/documentation-devsecops"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se agregó documentación detallada sobre las prácticas de DevSecOps implementadas en el proyecto.
+
+---
+### 21. **`feature/documentation-api`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-23**
+- **Commit**:
+  - **e5507da** (2024-09-23): *"Documentación sobre la API"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **3eb50af** (2024-09-23): *"Merge pull request #26 from Renato200419/feature/documentation-api"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se documentó detalladamente la API del proyecto, incluyendo endpoints y ejemplos de uso.
+
+---
+### 22. **`feature/documentation-readme`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-23**
+- **Commit**:
+  - **bde777f** (2024-09-23): *"Actualización - README.md"* por **ISMA12345830**
+- **Merge a `main`**:
+  - **0887c00** (2024-09-23): *"Merge pull request #27 from Renato200419/feature/documentation-readme"* realizado por **ISMA12345830**
+
+**Descripción**: Se actualizó el archivo `README.md` con información relevante sobre el proyecto.
+
+---
+### 23. **`feature/documentation-cherry-pick`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-23**
+- **Commits**:
+  - **5e6d680** (2024-09-23): *"Imágenes para la documentación de cherry-pick"* por **Jorge Barriga**
+  - **8d8c575** (2024-09-23): *"Actualizar documentación: Incluir uso de cherry-pick"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **0e42352** (2024-09-23): *"Merge pull request #28 from Renato200419/feature/documentation-cherry-pick"* realizado por **ISMA12345830**
+
+**Descripción**: Se añadió documentación sobre el uso de `git cherry-pick` para la gestión de commits específicos.
+
+---
+### 24. **`feature/documentation-client`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-23**
+- **Commits**:
+  - **1ab81e9** (2024-09-23): *"Agregando archivo.md"* por **ISMA12345830**
+  - **7ec771b** (2024-09-23): *"Participación de los jugadores en las partidas"* por **ISMA12345830**
+- **Merge a `main`**:
+  - **5a53ddb** (2024-09-23): *"Merge pull request #29 from Renato200419/feature/documentation-client"* realizado por **Jorge Barriga**
+
+**Descripción**: Se documentó la participación de los jugadores en las partidas y se añadieron detalles sobre el cliente del juego.
+
+---
+### 25. **`feature/BD-postgres-update-docker-compose`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-23**
+- **Commit**:
+  - **fe4500f** (2024-09-23): *"Subir actualización del docker-compose para que se conecte con el PostgreSQL"* por **Renato200419**
+- **Merge a `main`**:
+  - **3aabb44** (2024-09-23): *"Merge pull request #31 from Renato200419/feature/BD-postgres-update-docker-compose"* realizado por **Jorge Barriga**
+
+**Descripción**: Se actualizó el archivo `docker-compose.yml` para integrar el servicio de PostgreSQL, permitiendo que la aplicación se conecte a la base de datos dentro del entorno Docker.
+
+---
+### 26. **`feature/metrics-update-contador-players`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-23**
+- **Commit**:
+  - **531c28a** (2024-09-23): *"Subir métrica de contador de jugadores registrados"* por **Renato200419**
+- **Merge a `main`**:
+  - **5521b1d** (2024-09-23): *"Merge pull request #33 from Renato200419/feature/metrics-update-contador-players"* realizado por **Jorge Barriga**
+- **Reversión**:
+  - **60d82f1** (2024-09-23): *"Revert 'Subir métrica de contador de jugadores registrados'"* por **Jorge Barriga**
+- **Merge posterior**:
+  - **0a1f028** (2024-09-23): *"Merge pull request #34 from Renato200419/revert-33-feature/metrics-update-contador-players"* realizado por **ISMA12345830**
+
+**Descripción**: Se implementó una métrica para contar el número de jugadores registrados en la aplicación. Sin embargo, debido a conflictos o errores, se revirtió el commit y se realizó un merge para revertir los cambios.
+
+---
+### 27. **`feature/metrics-update-histogram`**
+
+- **Creado por**: **al-2100**
+- **Fecha de Creación**: **2024-09-23**
+- **Commit**:
+  - **b5b9033** (2024-09-23): *"Agregar métrica para jugadores con puntajes >=4"* por **al-2100**
+- **Merge a `main`**:
+  - **1daa3a2** (2024-09-23): *"Merge pull request #36 from Renato200419/feature/metrics-update-histogram"* realizado por **ISMA12345830**
+- **Reversión**:
+  - **3aa1236** (2024-09-25): *"Revert 'Agregar métrica para jugadores con puntajes >=4'"* por **Jorge Barriga**
+- **Merge posterior**:
+  - **af579a6** (2024-09-24): *"Merge pull request #38 from Renato200419/revert-36-feature/metrics-update-histogram"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se agregó una métrica para monitorear a los jugadores con puntajes mayores o iguales a 4. Debido a problemas, se revirtió el commit y se realizó un merge para revertir los cambios.
+
+---
+### 28. **`feature/metrics-update-jugadores_registrados`**
+
+- **Creado por**: **Renato Steven Olivera Calderón**
+- **Fecha de Creación**: **2024-09-24**
+- **Commit**:
+  - **34dca05** (2024-09-24): *"Subir métrica jugadores registrados"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **079874c** (2024-09-24): *"Merge pull request #39 from Renato200419/feature/metrics-update-jugadores_registrados"* realizado por **ISMA12345830**
+
+**Descripción**: Se implementó una métrica para registrar el número total de jugadores en la aplicación.
+
+---
+### 29. **`feature/metrics-update-puntuaciones_altas`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-24**
+- **Commit**:
+  - **0ab67dd** (2024-09-24): *"Agregar métrica de puntuaciones altas para puntos mayores a 4"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **779b3c4** (2024-09-24): *"Merge pull request #40 from Renato200419/feature/metrics-update-puntuaciones_altas"* realizado por **ISMA12345830**
+
+**Descripción**: Se añadió una métrica para rastrear las puntuaciones altas, específicamente para los puntos mayores a 4.
+
+---
+### 30. **`feature/metrics-update-cantidad_partidas`**
+
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-24**
+- **Commit**:
+  - **9142746** (2024-09-24): *"Agregar las métricas de la cantidad de partidas creadas"* por **ISMA12345830**
+- **Merge a `main`**:
+  - **bad5e3a** (2024-09-24): *"Merge pull request #42 from Renato200419/feature/metrics-update-cantidad_partidas"* realizado por **Jorge Barriga**
+
+**Descripción**: Se implementó una métrica para contar el número de partidas creadas en la aplicación.
+
+---
+### 31. **`feature/metrics-update`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-24**
+- **Merge a `main`**:
+  - **558fed6** (2024-09-24): *"Merge pull request #43 from Renato200419/feature/metrics-update"* realizado por **ISMA12345830**
+
+**Descripción**: Esta rama consolidó las actualizaciones de métricas realizadas en las ramas anteriores, integrando todas las nuevas métricas implementadas.
+
+---
+### 32. **`feature/refactor-structure`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-27**
+- **Commits**:
+  - **a4568b6** (2024-09-27): *"Reorganiza la estructura del proyecto y renombra archivos"* por **Jorge Barriga**
+  - **e0468a4** (2024-09-27): *"Modificar Dockerfile para la nueva estructura"* por **Jorge Barriga**
+  - **58160b7**, **535bcee**, **520955a** (2024-09-27): *"Actualizar PYTHONPATH en ci.yml para incluir el directorio raíz y app/"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **b8cc60b** (2024-09-27): *"Merge pull request #44 from Renato200419/feature/refactor-structure"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se reorganizó la estructura del proyecto para mejorar la mantenibilidad y escalabilidad, incluyendo cambios en la estructura de carpetas y archivos, y ajustes en el Dockerfile y el pipeline de CI.
+
+---
+### 33. **`feature/database-integration`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-27**
+- **Commits**:
+  - **e4b5790** (2024-09-27): *"Añadir modelos de Jugador y Partida con Peewee"* por **Renato200419**
+  - **8e726ab** (2024-09-27): *"Configurar conexión a PostgreSQL e inicializar tablas"* por **Renato200419**
+  - **4287cb5** (2024-09-27): *"Agregar funciones CRUD para Jugador y Partida"* por **Renato200419**
+- **Merge a `main`**:
+  - **25bb6b6** (2024-09-27): *"Merge pull request #45 from Renato200419/feature/database-integration"* realizado por **Jorge Barriga**
+
+**Descripción**: Se integró la base de datos PostgreSQL al proyecto utilizando el ORM Peewee, permitiendo operaciones CRUD sobre los modelos Jugador y Partida.
+
+---
+### 34. **`feature/metrics-and-endpoints`**
+
+- **Creado por**: **Jorge Barriga**
+- **Fecha de Creación**: **2024-09-27**
+- **Commits**:
+  - **14d3d1b** (2024-09-27): *"Implementar rutas para gestionar jugadores y partidas en routes.py"* por **Jorge Barriga**
+  - **4cfc3bf** (2024-09-27): *"Modificar main.py para exponer las rutas y métricas"* por **Jorge Barriga**
+  - **d106d8a** (2024-09-27): *"Actualizar dependencias"* por **Jorge Barriga**
+  - **fe76c33** (2024-09-27): *"Añadir dependencias"* por **Jorge Barriga**
+  - **e0b4c79** (2024-09-27): *"Agregar servicio de PostgreSQL en GitHub Actions"* por **Jorge Barriga**
 - **Commits adicionales**:
-  - **0653459**: *"Correción en la línea de COPY del Dockerfile"*.
-  - **e0ee16a**: *"Se agrega la estructura básica del docker-compose para la aplicación"*.
-- **Merge**:
-  - **Commit**: **bf985f9**
-  - **Acción**: Merge del pull request #4 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se corrigió el Dockerfile y se añadió un `docker-compose` para gestionar los servicios.
+  - **dcd5c47** (2024-09-28): *"Se incluye el servicio de PostgreSQL"* por **Renato200419**
+  - **dab3a8c** (2024-09-28): *"Se incluye un paso de espera adicional antes de ejecutar la aplicación"* por **Renato200419**
+  - **Ajustes en el pipeline y configuraciones adicionales** por **Jorge Barriga** y **Renato200419**
+- **Merge a `main`**:
+  - **51949a3** (2024-09-29): *"Merge pull request #46 from Renato200419/feature/metrics-and-endpoints"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se añadieron nuevas rutas en la API para gestionar jugadores y partidas utilizando la base de datos, y se expusieron métricas adicionales. Se ajustó el pipeline de CI/CD para incluir PostgreSQL en las pruebas automatizadas.
 
 ---
-### 6. **Creación y Merge de `feature/devsecops`**
-- **Branch**: `feature/devsecops` para configurar workflows.
+### 35. **`feature/docker-compose-update`**
+
+- **Creado por**: **Renato Steven Olivera Calderón**
+- **Fecha de Creación**: **2024-09-29**
 - **Commit**:
-  - **6cc559f**: *"Configuración de GitHub Workflows"* por **Jorge Barriga**.
-- **Merge**:
-  - **Commit**: **d809ba9**
-  - **Acción**: Merge del pull request #5 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se establecieron las bases para la integración continua y prácticas de DevSecOps.
+  - **5dad30a** (2024-09-29): *"Se actualiza el docker-compose con los volúmenes persistentes de Prometheus"* por **Renato Steven Olivera Calderón**
+- **Merge a `main`**:
+  - **9dde777** (2024-09-29): *"Merge pull request #47 from Renato200419/feature/docker-compose-update"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se actualizó el `docker-compose.yml` para incluir volúmenes persistentes para Prometheus, permitiendo que los datos de métricas se mantengan entre reinicios.
 
 ---
-### 7. **Creación y Merge de `fix/ci-pipeline`**
-- **Branch**: `fix/ci-pipeline` para solucionar problemas en el pipeline de CI.
-- **Commits en la rama**:
-  - **e799c19**: *"Agregar CI pipeline para pruebas en GitHub Actions"* por **al-2100**.
-  - **ef939f7** y **daa0434**: *"Test en branch /fix/ci-pipeline"* por **Jorge Barriga**.
-  - **0672469**: *"Agregar requirements.txt con dependencias del proyecto"* por **Jorge Barriga**.
-  - **2956a17**: *"Retirar tests (temporalmente)"* por **Jorge Barriga**.
-  - **c6bd1f4**: *"Retirar fix/ci-pipeline del pipeline CI"* por **Jorge Barriga**.
-- **Merge**:
-  - **Commit**: **72fd1f1**
-  - **Acción**: Merge del pull request #6 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se resolvieron errores en el pipeline de integración continua, mejorando la estabilidad del proceso de CI/CD.
+### 36. **`feature/mejorar_consola`**
 
----
-### 8. **Desarrollo de la Interfaz de Consola**
-#### a. **Creación de `feature/interfaz` y Sub-branches**
-- **Branch principal**: `feature/interfaz` para desarrollar la interfaz de usuario.
-- **Sub-branch**: `feature/interfaz-crear_partida`
-  - **Commit**:
-    - **988a08b**: *"Se agrega la función crear-partida"* por **Renato200419**.
-  - **Merge**:
-    - **Commit**: **61098d2**
-    - **Acción**: Merge del pull request #9 a `feature/interfaz`.
-    - **Responsable**: **ISMA12345830**.
-- **Sub-branch**: `feature/interfaz-mostrar_estadisticas`
-  - **Commit**:
-    - **f26e094**: *"Se agrega la función mostrar estadisticas"* por **ISMA12345830**.
-  - **Merge**:
-    - **Commit**: **cf0936d**
-    - **Acción**: Merge del pull request #10 a `feature/interfaz`.
-    - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Commits adicionales en `feature/interfaz`**:
-  - **c95e6e3**: *"Se agregan más funciones para la interfaz consola: lanzar_dados y registrar_jugador"* por **Renato200419**.
-  - **48ea60b**: *"Se agrego el menu principal"* por **ISMA12345830**.
-- **Merge a la rama principal**:
-  - **Commit**: **9852026**
-  - **Acción**: Merge del pull request #11 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se desarrolló la interfaz de consola, permitiendo interacción con el usuario para registrar jugadores, crear partidas y mostrar estadísticas.
-
----
-### 9. **Actualizaciones en la API**
-- **Branch**: `feature/api` actualizado.
-- **Commit**:
-  - **b394175**: *"Se añadio uvicorn"* por **ISMA12345830**.
-- **Merge**:
-  - **Commit**: **f481306**
-  - **Acción**: Merge del pull request #12 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se añadió `uvicorn` para el despliegue del servidor ASGI, mejorando el rendimiento de la aplicación.
-
----
-### 10. **Implementación de Pruebas**
-- **Branch**: `feature/pruebas` creado por **ISMA12345830**.
-- **Commit**:
-  - **6ab1738**: *"Configurar pruebas básicas en test_app.py"*.
-- **Merge**:
-  - **Commit**: **06cb580**
-  - **Acción**: Merge del pull request #13 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se añadieron pruebas unitarias básicas para garantizar el correcto funcionamiento de las funcionalidades implementadas.
-
----
-### 11. **Actualización del Pipeline de CI/CD**
-- **Branch**: `feature/actualizar-ci` para mejorar el pipeline.
+- **Creado por**: **ISMA12345830**
+- **Fecha de Creación**: **2024-09-30**
 - **Commits**:
-  - Ajustes en `ci.yml`, actualización de dependencias y corrección de errores por **ISMA12345830** y **Jorge Barriga**.
-- **Merge**:
-  - **Commit**: **4fb7d3f**
-  - **Acción**: Merge del pull request #16 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se optimizó el pipeline de CI/CD, incluyendo la actualización de `PYTHONPATH` y la instalación de dependencias necesarias.
+  - **e47caab** (2024-09-30): *"Mejoramiento del funcionamiento del game_console.py"* por **ISMA12345830**
+  - **4af76c8** (2024-09-30): *"Corrección de espacios del funcionamiento del game_console.py"* por **ISMA12345830**
+  - **24f36dd** (2024-09-30): *"Implementación de una funcionalidad del routes.py"* por **ISMA12345830**
+  - **7e38d2c** (2024-09-30): *"Implementación de la funcionalidad en el crud.py"* por **ISMA12345830**
+  - **73f7758** (2024-09-30): *"Corrección del crud.py"* por **ISMA12345830**
+  - **2cc41a5** (2024-09-30): *"Cambiar código esperado de 201 a 200"* por **Jorge Barriga**
+- **Merge a `main`**:
+  - **5030ba9** (2024-09-30): *"Merge pull request #48 from Renato200419/feature/mejorar_consola"* realizado por **Renato Steven Olivera Calderón**
+
+**Descripción**: Se mejoró el funcionamiento de la consola del juego, corrigiendo errores y optimizando la interacción con el usuario.
 
 ---
-### 12. **Configuración de Prometheus y Grafana**
-#### a. **Branch `prometheus-config`**
-- **Commit**:
-  - **234ef9a**: *"Crear prometheus.yml"* por **Renato200419**.
-- **Merge**:
-  - **Commit**: **6199f8f**
-  - **Acción**: Merge del pull request #14 a la rama principal.
-  - **Responsable**: **ISMA12345830**.
+### 37. **`feature/update_console`**
 
-#### b. **Actualización de `feature/docker-setup`**
-- **Commit**:
-  - **ed971b5**: *"Actualizar docker-compose.yml para incluir Prometheus y Grafana"* por **Renato200419**.
-- **Merge**:
-  - **Commit**: **7102deb**
-  - **Acción**: Merge del pull request #15 a la rama principal.
-  - **Responsable**: **ISMA12345830**.
-- **Descripción**: Se integraron Prometheus y Grafana al entorno Docker para la monitorización y visualización de métricas.
-
----
-
-### 13. **Implmentación y Corrección de Métricas**
-- **Branch**: `feature/metrics` creado por **Renato200419**.
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-10-01**
 - **Commits**:
-  - **a93f901**: *"Agregar prometheus_fastapi_instrumentator y prometheus_client"*.
-  - **95d2fdb**: *"Modificar app.py para incluir métricas de tiradas y latencia"*.
-  - **aa19308**: *"Actualizar la forma en la que se instalan las dependencias"*.
-- **Merge y Reversiones**:
-  - **Merge** del pull request #19.
-  - Reversiones realizadas para corregir errores en las métricas implementadas.
-- **Descripción**: Se añadieron métricas personalizadas y se realizaron ajustes para asegurar su correcto funcionamiento.
+  - **39c1564** (2024-10-01): *"Evitar creación automática de jugadores no registrados al crear partida"* por **Renato200419**
+  - **01efef5** (2024-10-01): *"Agrega atributo para contar victorias del jugador e importa IntegerField"* por **Renato200419**
+  - **b7824d6** (2024-10-01): *"Se crea el endpoint mostrar_ranking"* por **Renato200419**
+  - **fa69565** (2024-10-01): *"Se modifica routes.py para calcular y devolver el cambio de ranking"* por **Renato200419**
+  - **f1c8b1f** (2024-10-01): *"Modifica la función lanzar_dados para reflejar el cambio de posición"* por **Renato200419**
+  - **e943b3a** (2024-10-01): *"Se elimina el comentario del menú"* por **Renato200419**
+  - **588c653** (2024-10-01): *"Mejorar lógica de creación de partida y validación de puntajes"* por **Renato200419**
+  - **b00f838** (2024-10-01): *"Agregar atributo de partidas jugadas al modelo Jugador"* por **Renato200419**
+  - **7ff3161** (2024-10-01): *"Incrementar el contador de partidas jugadas al finalizar cada partida"* por **Renato200419**
+  - **7a3801d** (2024-10-01): *"Modificación del título de ranking así como la función"* por **Renato200419**
+- **Merge a `main`**:
+  - **bac1385** (2024-10-01): *"Merge pull request #49 from Renato200419/feature/update_console"* realizado por **Jorge Barriga**
+- **Etiqueta**:
+  - **v1.1.0**
+
+**Descripción**: Se añadieron nuevas funcionalidades a la consola del juego, incluyendo la gestión de rankings y estadísticas de jugadores. Se lanzó la versión **v1.1.0** del proyecto.
 
 ---
-### 14. **Configuración Adicional de Prometheus y Grafana**
-- **Branch**: `feature/configurar-prometheus-grafana` por **Renato Steven Olivera Calderón**.
+### 38. **`feature/documentacion-pc1`**
+
+- **Creado por**: **Renato200419**
+- **Fecha de Creación**: **2024-09-27**
 - **Commits**:
-  - **9429051**: *"Actualización del docker-compose para almacenar datos"*.
-  - **08cbbad**: *"Dashboard creado"*.
-- **Merge**:
-  - **Commit**: **ab3261f**
-  - **Acción**: Merge del pull request #21 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se configuró el almacenamiento de datos y se creó un dashboard personalizado en Grafana.
+  - **f4c1296** (2024-09-27): *"Agregar índice general en documentacion-pc1.md"* por **Renato Steven Olivera Calderón**
+  - **0b5eba6** (2024-09-27): *"Se agrega el manejo de ramas en el proyecto del punto 1-10"* por **Renato200419**
+  - **156731a** (2024-09-27): *"Manejo de ramas del punto 11 al 19"* por **Jorge Barriga**
+  - **e917f8f** (2024-09-27): *"Eliminación de antiguos Markdown"* por **Renato200419**
+  - **7ea165a** (2024-09-29): *"Reestructuración del índice de la documentación"* por **Renato Steven Olivera Calderón**
+  - **60f0d83** (2024-09-29): *"Se sube avance de la documentación de Docker y Docker-Compose incluyendo el servicio de PostgreSQL"* por **Renato200419**
+  - **b471c61** (2024-09-29): *"Subir imagen del gráfico de red de todas las ramas creadas"* por **Renato200419**
+  - **712c845** (2024-09-29): *"Subir avance de la documentación de la gestión del proyecto con Git"* por **Renato200419**
+  - **1bc3de7** (2024-09-30): *"Añadir imágenes para documentación"* por **Jorge Barriga**
+  - **2c5f417** (2024-09-30): *"Actualización y mejora del documento"* por **Jorge Barriga**
 
----
-### 15. **Ampliación de la Documentación**
-- **Branches creados**:
-  - `feature/documentation-docker`
-  - `feature/documentation-observability`
-  - `feature/documentation-git-usage`
-  - `feature/documentation-devsecops`
-  - `feature/documentation-api`
-  - `feature/documentation-readme`
-  - `feature/documentation-cherry-pick`
-  - `feature/documentation-client`
-- **Commits destacados**:
-  - **572a11f**: *"Subir documentación Docker.md"*.
-  - **2b86073**: *"Se agrega el archivo Markdown que explica la Observabilidad en el proyecto"*.
-  - **6a996a7**: *"Subir documentación del uso de Git y resolución de conflictos"*.
-  - **97723af**: *"Documentación DevSecOps"*.
-  - **e5507da**: *"Documentación sobre la API"*.
-  - **bde777f**: *"Actualizacion -  README.md"*.
-  - **8d8c575**: *"Actualizar documentación: Incluir uso de cherry-pick"*.
-  - **1ab81e9**: *"Agregando archivo.md"*.
-  - **7ec771b**: *"Participacion de los jugadores en las partidas"*.
-- **Merges**: Pull requests #22 al #29 fusionados a la rama principal.
-- **Descripción**: Se enriqueció la documentación del proyecto en diversas áreas, facilitando la comprensión y colaboración.
+**Descripción**: Se amplió y mejoró la documentación del proyecto, detallando el manejo de ramas y merges en el repositorio, y agregando información sobre Docker, Docker-Compose y PostgreSQL (Falta el último commit y el commit de merge pues no es posible saberlo).
 
----
-### 16. **Implementación de Métricas Avanzadas y Resolución de Conflictos**
-- **Branches y Commits**:
-  - **feature/metrics-update-contador-players**
-    - **531c28a**: *"Subir métrica de contador de jugadores registrados"*.
-    - **Revertido**: mediante pull request #34.
-  - **feature/metrics-update-histogram**
-    - **b5b9033**: *"Agregar métrica para jugadores con puntajes >=4"*.
-    - **Revertido**: mediante pull request #38.
-  - **feature/metrics-update-jugadores_registrados**, **feature/metrics-update-puntuaciones_altas**, **feature/metrics-update-cantidad_partidas**
-    - Múltiples commits y merges para ajustar las métricas.
-- **Descripción**: Se implementaron nuevas métricas y se resolvieron conflictos surgidos durante su integración.
-
----
-### 17. **Refactorización de la Estructura del Proyecto**
-- **Branch**: `feature/refactor-structure` por **Renato Steven Olivera Calderón**.
-- **Commits**:
-  - **a4568b6**: *"Reorganiza la estructura del proyecto y renombra archivos"* por **Jorge Barriga**.
-  - **e0468a4**: *"Modificar Dockerfile para la nueva estructura"*.
-- **Merge**:
-  - **Commit**: **b8cc60b**
-  - **Acción**: Merge del pull request #44 a la rama principal.
-  - **Responsable**: **Renato Steven Olivera Calderón**.
-- **Descripción**: Se reorganizó la estructura del proyecto para mejorar la mantenibilidad y escalabilidad.
-
----
-### 18. **Integración de la Base de Datos**
-- **Branch**: `feature/database-integration` por **Renato200419**.
-- **Commits**:
-  - **e4b5790**: *"Añadir modelos de Jugador y Partida con Peewee"*.
-  - **8e726ab**: *"Configurar conexión a PostgreSQL e inicializar tablas"*.
-  - **4287cb5**: *"Agregar funciones CRUD para Jugador y Partida"*.
-- **Merge**:
-  - **Commit**: **25bb6b6**
-  - **Acción**: Merge del pull request #45 a la rama principal.
-  - **Responsable**: **Jorge Barriga**.
-- **Descripción**: Se integró la base de datos PostgreSQL al proyecto, permitiendo operaciones CRUD y persistencia de datos.
-
----
-### 19. **Actualizaciones Finales**
-- **Commits directos** a la rama principal por **Jorge Barriga**:
-  - **14d3d1b**: *"Implementar rutas para gestionar jugadores y partidas en routes.py"*.
-  - **4cfc3bf**: *"Modificar main.py para exponer las rutas y métricas"*.
-  - **d106d8a**: *"Actualizar dependencias"*.
-  - **fe76c33**: *"Añadir dependencias"*.
-  - **e0b4c79**: *"Agregar servicio de PostgreSQL en GitHub Actions"*.
-- **Descripción**: Mejoras y ajustes finales para asegurar el correcto funcionamiento del proyecto.
 ### Gráfico de Red luego de la creación de todas las ramas
 ![Descripción de la imagen](Imagenes-git/GN.jpg)
-
----
-Aquí tienes la sección revisada con la descripción detallada de cada paso del CI/CD junto con las explicaciones específicas de DevOps, sin borrar información relevante:
 
 ---
 

@@ -10,3 +10,4 @@ def test_root():
     assert response.json() == {"message": "Bienvenido al Juego de Dados"}
 
 # Pruebas eliminadas por el momento
+

@@ -33,7 +33,7 @@ def crear_partida():
 
 def lanzamiento_animado():
     """Animación de lanzamiento de dados."""
-    print(Fore.YELLOW + "Lanzando dados...D", end="")
+    print(Fore.YELLOW + "Lanzando dados...", end="")
     for _ in range(3):
         print(".", end="", flush=True)
         time.sleep(0.5)

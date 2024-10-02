@@ -1,70 +1,128 @@
-# Proyecto 9: Juego de Dados Competitivo
+# Juego de Dados Competitivo
 
 ## Descripción del Proyecto
-Este proyecto implementa un juego de dados competitivo donde los jugadores compiten por obtener la mayor puntuación. Las estadísticas del juego se almacenan en un servidor y se monitorean en tiempo real usando Prometheus y Grafana. Además, se implementa un flujo de DevSecOps con análisis de seguridad y CI/CD.
 
-## Tecnologías Utilizadas
-- **Lenguajes de Programación**: Python
-- **Framework**: FastAPI para la API REST.
-- **Contenerización**: Docker, Docker Compose
-- **Monitoreo**: Prometheus, Grafana
-- **DevSecOps**: Script de auditoría de seguridad (`audit.sh`), GitHub Actions para CI/CD
+El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que permite a los jugadores competir en partidas lanzando dados y acumulando puntos. Los jugadores pueden unirse a salas, participar en partidas y ver su posición en el ranking en tiempo real. La aplicación se ejecuta en un entorno contenerizado con Docker y utiliza Prometheus y Grafana para monitorear métricas del juego. Además, el proyecto sigue un flujo DevSecOps que automatiza las pruebas, auditorías de seguridad y despliegues con GitHub Actions.
 
-## Objetivos
-1. Implementar una API REST que gestione las partidas y registre las puntuaciones de los jugadores.
-2. Desarrollar un cliente de consola (en `main.py`) para que los jugadores puedan participar en las partidas.
-3. Configurar un análisis de seguridad usando un script (`audit.sh`) y generar reportes de vulnerabilidades (`audit_report.txt`).
-4. Usar Docker y Docker Compose para contenerizar la aplicación y gestionar los servicios.
-5. Monitorear las métricas del juego como la cantidad de tiradas y la latencia de la API utilizando Prometheus y Grafana.
-6. Gestionar el CI/CD mediante GitHub Actions (`.github/workflows/ci.yml`).
+## Características Principales
 
-## Estructura del Proyecto
-- **`app.py`**: Implementación principal de la API REST.
-- **`main.py`**: Cliente de consola para jugar al juego de dados.
-- **`docker-compose.yml`**: Archivo para orquestar los servicios de Docker.
-- **`requirements.txt`**: Dependencias del proyecto.
-- **`prometheus.yml`**: Configuración para Prometheus.
-- **`audit.sh`**: Script de análisis de seguridad.
-- **`audit_report.txt`**: Informe de seguridad generado.
-- **`/Dashboard/`**: Configuraciones de métricas para Prometheus y Grafana.
-- **`tests/`**: Contiene tests para verificar el correcto funcionamiento del juego.
+- **API REST**: Implementada con FastAPI para gestionar jugadores, partidas y estadísticas.
+- **Cliente de Consola (`game_console.py`)**: Interfaz de línea de comandos para que los jugadores se registren, creen partidas, lancen dados y visualicen estadísticas de juego.
+- **Salas de Espera**: Los jugadores pueden unirse a salas antes de que las partidas comiencen.
+- **Monitoreo en Tiempo Real**: Configuración de Prometheus y Grafana para visualizar métricas y estadísticas del juego.
+- **DevSecOps Integrado**: Automatización de pruebas, auditoría de seguridad y análisis CI/CD.
 
 ## Guía de Instalación y Uso
 
 ### Requisitos Previos
-- Docker y Docker Compose instalados.
-- Acceso a una terminal.
+
+- Docker y Docker Compose instalados en el sistema.
 
 ### Instalación
+
 1. Clona el repositorio del proyecto:
-   ```bash
-   git clone https://github.com/usuario/juego-dados-competitivo.git
-2. Navega al directorio del proyecto:
-   ```bash
-   cd juego-dados-competitivo
-3. Construye y levanta los servicios con Docker Compose:
     ```bash
-   docker-compose up --build
-###Uso
-1. Ejecuta el cliente de consola:
-   ```bash
-   python main.py
-2. Accede al tablero de Grafana en http://localhost:3000 para ver las métricas en tiempo real.
+    git clone https://github.com/usuario/proyecto-juego-dados.git
+    cd proyecto-juego-dados
+    ```
 
-## Cómo Contribuir
-1. Haz un fork del repositorio.
-2. Crea una nueva rama
-   ```bash
-   git checkout -b nueva-funcionalidad.
-3. Realiza los cambios necesarios y commitea
-   ```bash
-   git commit -m 'Añadir nueva funcionalidad'
-4. Empuja los cambios a tu fork
-   ```bash
-   git push origin nueva-funcionalidad
-6. Crea un Pull Request en GitHub, para revisión.
+2. Construye y levanta los servicios utilizando Docker Compose:
+    ```bash
+    docker-compose up --build
+    ```
 
-## Funcionalidades Futuras:
-- Añadir autenticación de usuarios.
-- Incluir más tipos de juegos de dados.
-- Mejorar las métricas con análisis avanzados de las partidas.
+3. Accede a la consola del juego:
+    ```bash
+    python game_console.py
+    ```
+
+### Cómo Jugar
+
+Una vez que accedes a la consola (`game_console.py`), sigue las instrucciones en pantalla para interactuar con el juego. A continuación se detalla el flujo de juego:
+
+1. **Registrar un Jugador**
+   - Selecciona la opción `1. Registrar Jugador` e ingresa el nombre del jugador que deseas registrar en el sistema.
+   - Ejemplo:
+     ```
+     Ingresa el nombre del jugador: Juan
+     Jugador Juan registrado con éxito.
+     ```
+
+2. **Crear una Partida**
+   - Selecciona la opción `2. Crear Partida`.
+   - Indica el número de jugadores que participarán en la partida.
+   - Ingresa los nombres de los jugadores registrados que se unirán a la partida.
+   - Ejemplo:
+     ```
+     Ingresa el número de jugadores: 2
+     Ingresa el nombre del jugador: Juan
+     Ingresa el nombre del jugador: Ana
+     Partida 1 creada con éxito.
+     ```
+
+3. **Lanzar Dados**
+   - Selecciona la opción `3. Lanzar Dados`.
+   - Ingresa el ID de la partida para la cual deseas lanzar los dados.
+   - Los jugadores lanzan los dados en su turno y acumulan puntos. Si algún jugador alcanza el puntaje de victoria (por ejemplo, 50 puntos), la partida finaliza y se declara un ganador.
+   - Ejemplo:
+     ```
+     Ingresa el ID de la partida para lanzar los dados: 1
+     Lanzando dados...D...D...D ¡Listo!
+     ¡La partida ha terminado! El ganador es Juan con 50 puntos.
+     ```
+
+4. **Mostrar Estadísticas de Partida**
+   - Selecciona la opción `4. Mostrar Estadísticas`.
+   - Ingresa el ID de la partida de la cual deseas ver las estadísticas y se mostrarán los puntajes acumulados de cada jugador.
+   - Ejemplo:
+     ```
+     Ingresa el ID de la partida para ver estadísticas: 1
+     Estadísticas de la partida:
+     Puntuaciones: {'Juan': 50, 'Ana': 30}
+     ```
+
+5. **Ver el Ranking de Jugadores**
+   - Selecciona la opción `5. Mostrar Ranking`.
+   - Se mostrará el ranking global de jugadores basado en la cantidad de victorias obtenidas.
+   - Ejemplo:
+     ```
+     === Ranking de Jugadores ===
+     1. Juan - 3 victorias
+     2. Ana - 2 victorias
+     ```
+
+6. **Salir del Juego**
+   - Selecciona la opción `6. Salir` para finalizar la ejecución del cliente de consola.
+
+### Monitorización del Juego
+
+Para monitorear las métricas del juego:
+
+1. Accede a la interfaz de Grafana en `http://localhost:3000`.
+2. Importa el dashboard desde la carpeta `dashboards/` del proyecto:
+   - Ingresa a Grafana y selecciona la opción **Import** en la barra lateral.
+   - Carga el archivo JSON de la carpeta `dashboards/` que contiene la configuración del dashboard.
+
+## Estructura del Proyecto
+
+- **`app/`**: Implementación de la API REST y lógica del juego.
+- **`game_console.py`**: Cliente de consola para interactuar con el juego.
+- **`docker-compose.yml`**: Archivo de configuración para Docker Compose.
+- **`prometheus.yml`**: Configuración de Prometheus para la recolección de métricas.
+- **`dashboards/`**: Carpeta que contiene el archivo JSON del dashboard de Grafana.
+- **`audit.sh`**: Script para realizar auditorías de seguridad.
+- **`/Dashboard/`**: Configuraciones y paneles para visualizar métricas en Grafana.
+- **`tests/`**: Pruebas unitarias y de integración para asegurar el correcto funcionamiento de la aplicación.
+
+## Integrantes del Proyecto
+Jorge Alonso Barriga Morales
+Renato Steven Olivera Calderón
+José Ismael Llanos Rosadio
+
+## Contribuciones
+
+Si deseas contribuir a este proyecto:
+
+1. Realiza un fork del repositorio.
+2. Crea una nueva rama con las mejoras o correcciones (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza un Pull Request explicando tus cambios.

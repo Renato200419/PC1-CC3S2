@@ -1,15 +1,16 @@
-# Usamos la imagen base de Python 3.8
 FROM python:3.8
 
-# Copiamos todos los archivos del directorio actual al contenedor en la ruta '/app'
+# Crear directorio de la app y copiar todo el contenido
+WORKDIR /app
+
+# Copiar el contenido del directorio actual a /app en el contenedor
 COPY . /app
 
-# Establecemos el directorio de trabajo en '/app'
-WORKDIR /app
-COPY requirements.txt ./
-
-# Instalamos las dependencias necesarias
+# Instalar las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Comando para ejecutar la aplicación con Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Exponer el puerto
+EXPOSE 8000
+
+# Ejecutar la aplicación con Uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

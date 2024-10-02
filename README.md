@@ -29,13 +29,32 @@ El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que 
     ```bash
     docker-compose up --build
     ```
+### Como iniciar el juego
 
-3. Accede a la consola del juego:
-    ```bash
-    python game_console.py
-    ```
+1. Crea el entorno virtual
 
-### Cómo Jugar
+   ```bash
+   python3 -m venv venv
+   ```
+2. Activa el entorno virtual
+
+   ```bash
+   # En Windows:
+   venv\Scripts\activate
+   # En macOS/Linux:
+   source venv/bin/activate
+   ```
+3. Instala las dependencias necesarias
+
+   ```
+   pip install requests colorama
+   ```
+
+4. Accede a la consola del juego
+   ```bash
+   python game_console.py
+   ```
+### Cómo Iniciar el Juego
 
 Una vez que accedes a la consola (`game_console.py`), sigue las instrucciones en pantalla para interactuar con el juego. A continuación se detalla el flujo de juego:
 

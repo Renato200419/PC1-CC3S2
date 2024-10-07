@@ -1,5 +1,5 @@
 from peewee import Model, CharField, ForeignKeyField, AutoField, IntegerField
-from .database import db
+from .config import db
 
 # Clase base para todos los modelos
 class BaseModel(Model):

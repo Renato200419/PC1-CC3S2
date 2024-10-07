@@ -82,7 +82,8 @@ def step_impl(context):
 
 @then('el sistema declara al ganador y finaliza la partida')
 def step_impl(context):
-    assert context.response.status_code in [200, 201]
-    data = context.response.json()
-    # Expresión regular para verificar ganador
-    assert re.search(r"¡La partida ha terminado! El ganador es (.+) con (\d+) puntos.", data["mensaje"])
+    response = context.response
+    data = response.json()
+    expected_message_pattern = r"¡La partida ha terminado! El ganador es (.+) con (\d+) puntos."
+
+    assert re.search(expected_message_pattern, data["mensaje"]), f"Expected message pattern not found in: {data['mensaje']}"

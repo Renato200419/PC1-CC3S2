@@ -66,7 +66,7 @@ jobs:
         run: |
           echo "Waiting for the application to be ready..."
           sleep 15
-          until docker exec juego-dados curl -s http://localhost:8000/health; do
+          until docker exec juego-dados curl -s http://localhost:8000/; do
             echo "Waiting for application to be up..."
             sleep 5
           done

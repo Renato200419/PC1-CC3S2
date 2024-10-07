@@ -12,80 +12,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: postgres:13
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: dadosdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U admin -d dadosdb" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 10
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      - name: Install dependencies
+      - name: Set up Docker Compose
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade setuptools
-          pip install -r requirements.txt
-          pip install behave requests
+          docker version
+          docker-compose version
 
-      - name: Set up environment variables
+      - name: Build and start services
         run: |
-          echo "DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb" >> $GITHUB_ENV
-          echo "PYTHONPATH=." >> $GITHUB_ENV
+          docker-compose up -d --build
 
-      - name: Build Docker image
-        run: docker build -t juego-dados-competitivo .
-
-      - name: Create Docker network
-        run: docker network create juego-dados-network
-
-      - name: Run Docker containers
+      - name: Wait for services to be ready
         run: |
-          docker run -d --network juego-dados-network --name db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dadosdb postgres:13
-          docker run -d --network juego-dados-network --name juego-dados -e DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb -p 8000:8000 juego-dados-competitivo
-
-      - name: Verify container status
-        run: docker ps -a
-
-      - name: Wait for the application to be ready
-        run: |
-          echo "Waiting for the application to be ready..."
-          sleep 15
-          until docker exec juego-dados curl -s http://localhost:8000/; do
-            echo "Waiting for application to be up..."
-            sleep 5
+          echo "Waiting for services to be ready..."
+          for i in {1..30}; do
+            if docker-compose exec app curl -s http://localhost:8000/; then
+              echo "Services are ready!"
+              break
+            else
+              echo "Waiting for services to be ready..."
+              sleep 5
+            fi
           done
-          echo "Application is ready!"
 
       - name: Run Behave tests
-        run: docker exec juego-dados behave
+        run: |
+          docker-compose exec app behave
 
       - name: Run unit tests
-        run: docker exec juego-dados pytest tests/
-
-      - name: Install pip-audit
-        run: pip install pip-audit
+        run: |
+          docker-compose exec app pytest tests/
 
       - name: Audit dependencies
-        run: pip-audit
-
-      - name: Stop and remove containers and network
         run: |
-          docker stop juego-dados db
-          docker rm juego-dados db
-          docker network rm juego-dados-network
+          docker-compose exec app pip install pip-audit
+          docker-compose exec app pip-audit
+
+      - name: Tear down services
+        run: |
+          docker-compose down

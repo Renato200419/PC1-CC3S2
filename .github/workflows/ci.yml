@@ -42,26 +42,10 @@ jobs:
           pip install --upgrade setuptools
           pip install -r requirements.txt
 
-      - name: Wait for PostgreSQL to be ready
+      - name: Set up environment variables
         run: |
-          echo "Waiting for PostgreSQL to be ready..."
-          until pg_isready -h localhost -p 5432 -U admin -d dadosdb; do
-            sleep 5
-          done
-          echo "PostgreSQL is ready!"
-
-      - name: Run tests
-        env:
-          DATABASE_URL: postgresql://admin:secret@localhost:5432/dadosdb
-          PYTHONPATH: .
-        run: |
-          pytest tests/
-
-      - name: Install pip-audit
-        run: pip install pip-audit
-
-      - name: Audit dependencies
-        run: pip-audit
+          echo "DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb" >> $GITHUB_ENV
+          echo "PYTHONPATH=." >> $GITHUB_ENV
 
       - name: Build Docker image
         run: docker build -t juego-dados-competitivo .
@@ -69,15 +53,28 @@ jobs:
       - name: Create Docker network
         run: docker network create juego-dados-network
 
-      - name: Run Docker container
+      - name: Run Docker containers
         run: |
-          docker run -d --network juego-dados-network --name juego-dados -p 8000:8000 juego-dados-competitivo
+          docker run -d --network juego-dados-network --name db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dadosdb postgres:13
+          docker run -d --network juego-dados-network --name juego-dados -e DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb -p 8000:8000 juego-dados-competitivo
 
       - name: Verify container status
         run: docker ps -a
 
+      - name: Run Behave tests
+        run: docker exec juego-dados behave
+
+      - name: Run unit tests
+        run: docker exec juego-dados pytest tests/
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Audit dependencies
+        run: pip-audit
+
       - name: Stop and remove containers and network
         run: |
-          docker stop juego-dados
-          docker rm juego-dados
+          docker stop juego-dados db
+          docker rm juego-dados db
           docker network rm juego-dados-network

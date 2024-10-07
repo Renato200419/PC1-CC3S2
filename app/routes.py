@@ -157,3 +157,10 @@ def eliminar_jugador(nombre: str):
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     jugador.delete_instance()
     return {"mensaje": f"Jugador {nombre} eliminado con éxito"}
+
+@router.get("/jugadores/{nombre}")
+def obtener_jugador(nombre: str):
+    jugador = get_jugador_by_name(nombre)
+    if not jugador:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+    return {"nombre": jugador.nombre, "victorias": jugador.victorias, "partidas": jugador.partidas}

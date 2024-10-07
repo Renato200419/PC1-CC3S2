@@ -41,6 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade setuptools
           pip install -r requirements.txt
+          pip install behave requests
 
       - name: Set up environment variables
         run: |
@@ -60,6 +61,16 @@ jobs:
 
       - name: Verify container status
         run: docker ps -a
+
+      - name: Wait for the application to be ready
+        run: |
+          echo "Waiting for the application to be ready..."
+          sleep 15
+          until docker exec juego-dados curl -s http://localhost:8000/health; do
+            echo "Waiting for application to be up..."
+            sleep 5
+          done
+          echo "Application is ready!"
 
       - name: Run Behave tests
         run: docker exec juego-dados behave

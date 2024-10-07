@@ -50,6 +50,10 @@ jobs:
       - name: Run unit tests
         run: |
           docker-compose exec app pytest tests/
+          
+      - name: Update pip and setuptools
+        run: |
+          docker-compose exec app pip install --upgrade pip setuptools
 
       - name: Audit dependencies
         run: |

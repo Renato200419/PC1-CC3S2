@@ -1,12 +1,50 @@
-version: '3.8'  # Usa la versión 3.8 de Docker Compose
+# version: '3.8'
 
 services:
-  app:  # Nombre del servicio
-    build: .  # Construye la imagen a partir del Dockerfile en el directorio actual
+  app:
+    build: .  # Construye la imagen desde el Dockerfile en el directorio actual
     ports:
       - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 del host
+    depends_on:
+      - db  # Asegura que el servicio de base de datos PostgreSQL esté en ejecución antes de iniciar la app
     environment:
-      - ENVIRONMENT=production  # Define una variable de entorno
+      - DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb  # Configurar la URL de la base de datos
     volumes:
-      - .:/app  # Monta el directorio actual en '/app' dentro del contenedor
-    command: uvicorn app:app --host 0.0.0.0 --port 8000  # Comando para ejecutar la aplicación
+      - .:/app  # Monta el directorio actual en /app dentro del contenedor
+
+  db:
+    image: postgres:13  # Usa la imagen oficial de PostgreSQL
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: dadosdb
+    ports:
+      - "5432:5432"  # Mapea el puerto 5432 del contenedor al puerto 5432 del host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Define un volumen para la persistencia de datos
+
+  prometheus:
+    image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
+      - prometheus_data:/prometheus  # Persistencia de datos de Prometheus
+    ports:
+      - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
+    depends_on:
+      - app  # Asegura que el servicio 'app' esté en ejecución antes de iniciar Prometheus
+
+  grafana:
+    image: grafana/grafana  # Utiliza la imagen oficial de Grafana
+    volumes:
+      - grafana_data:/var/lib/grafana  # Persiste datos de Grafana aquí
+    ports:
+      - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
+    depends_on:
+      - prometheus  # Asegura que Prometheus esté en ejecución antes de iniciar Grafana
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false  # Desactiva el registro de nuevos usuarios
+
+volumes:
+  postgres_data:  # Volumen para persistir los datos de PostgreSQL
+  grafana_data:  # Volumen para persistir los datos de Grafana
+  prometheus_data:  # Volumen para persistir los datos de Prometheus

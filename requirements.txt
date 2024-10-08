@@ -1,4 +1,15 @@
-fastapi==0.95.2
-uvicorn==0.22.0
-pydantic==1.10.5
-pip-audit==2.4.0
+fastapi~=0.115.0
+uvicorn~=0.22.0
+pydantic~=2.9.2
+pip-audit
+pytest
+httpx
+
+prometheus_client~=0.21.0
+prometheus-fastapi-instrumentator
+requests~=2.32.3
+
+peewee~=3.17.6
+psycopg2-binary==2.9.6
+
+behave ~=1.2.6

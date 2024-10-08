@@ -46,6 +46,12 @@ services:
     depends_on:
       app:
         condition: service_healthy  # Espera hasta que el servicio 'app' esté en estado 'healthy'
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   grafana:
     image: grafana/grafana  # Utiliza la imagen oficial de Grafana

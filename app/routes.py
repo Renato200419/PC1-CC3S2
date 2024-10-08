@@ -27,7 +27,7 @@ class Partida(BaseModel):
     puntajes: dict
 
 # Rutas de la API
-@router.post("/jugadores/")
+@router.post("/jugadores/", status_code=201)
 def registrar_jugador(jugador: Jugador):
     if get_jugador_by_name(jugador.nombre):
         raise HTTPException(status_code=400, detail="El jugador ya está registrado")

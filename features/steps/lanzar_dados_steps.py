@@ -41,7 +41,7 @@ def step_impl(context):
     context.partida_id = re.search(r"Partida (\d+) creada con éxito", response["mensaje"]).group(1)
 
     # Bucle Simulando que los jugadores ya alcanzaron el puntaje máximo
-    for _ in range(15):
+    for _ in range(50):
         response = requests.post(f"{API_URL}/partidas/{context.partida_id}/lanzar")
         if response.status_code not in [200, 201]:
             break

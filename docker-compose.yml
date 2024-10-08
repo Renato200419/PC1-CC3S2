@@ -1,10 +1,13 @@
+version: '3.8'
+
 services:
   app:
     build: .  # Construye la imagen desde el Dockerfile en el directorio actual
     ports:
       - "8000:8000"  # Mapea el puerto 8000 del contenedor al puerto 8000 del host
     depends_on:
-      - db  # Asegura que el servicio de base de datos PostgreSQL esté en ejecución antes de iniciar la app
+      db:
+        condition: service_healthy  # Espera hasta que el servicio 'db' esté en estado 'healthy'
     environment:
       - DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb  # Configurar la URL de la base de datos
     volumes:
@@ -41,7 +44,8 @@ services:
     ports:
       - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
     depends_on:
-      - app  # Asegura que el servicio 'app' esté en ejecución antes de iniciar Prometheus
+      app:
+        condition: service_healthy  # Espera hasta que el servicio 'app' esté en estado 'healthy'
 
   grafana:
     image: grafana/grafana  # Utiliza la imagen oficial de Grafana
@@ -50,7 +54,8 @@ services:
     ports:
       - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
     depends_on:
-      - prometheus  # Asegura que Prometheus esté en ejecución antes de iniciar Grafana
+      prometheus:
+        condition: service_healthy  # Espera hasta que Prometheus esté en estado 'healthy'
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false  # Desactiva el registro de nuevos usuarios
 

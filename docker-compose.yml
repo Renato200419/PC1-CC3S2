@@ -1,5 +1,3 @@
-# version: '3.8'
-
 services:
   app:
     build: .  # Construye la imagen desde el Dockerfile en el directorio actual
@@ -11,6 +9,12 @@ services:
       - DATABASE_URL=postgresql://admin:secret@db:5432/dadosdb  # Configurar la URL de la base de datos
     volumes:
       - .:/app  # Monta el directorio actual en /app dentro del contenedor
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   db:
     image: postgres:13  # Usa la imagen oficial de PostgreSQL
@@ -21,13 +25,19 @@ services:
     ports:
       - "5432:5432"  # Mapea el puerto 5432 del contenedor al puerto 5432 del host
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Define un volumen para la persistencia de datos
+      - postgres_data:/var/lib/postgresql/data  # Volumen persistente para la base de datos
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   prometheus:
     image: prom/prometheus  # Utiliza la imagen oficial de Prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Monta el archivo de configuración de Prometheus
-      - prometheus_data:/prometheus  # Persistencia de datos de Prometheus
+      - prometheus_data:/prometheus  # Volumen persistente para los datos de Prometheus
     ports:
       - "9090:9090"  # Mapea el puerto 9090 del contenedor al puerto 9090 del host
     depends_on:
@@ -36,7 +46,7 @@ services:
   grafana:
     image: grafana/grafana  # Utiliza la imagen oficial de Grafana
     volumes:
-      - grafana_data:/var/lib/grafana  # Persiste datos de Grafana aquí
+      - grafana_data:/var/lib/grafana  # Volumen persistente para los datos de Grafana
     ports:
       - "3000:3000"  # Mapea el puerto 3000 del contenedor al puerto 3000 del host
     depends_on:
@@ -45,6 +55,6 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false  # Desactiva el registro de nuevos usuarios
 
 volumes:
-  postgres_data:  # Volumen para persistir los datos de PostgreSQL
-  grafana_data:  # Volumen para persistir los datos de Grafana
-  prometheus_data:  # Volumen para persistir los datos de Prometheus
+  postgres_data:  # Definir el volumen persistente para PostgreSQL
+  prometheus_data:  # Definir el volumen persistente para Prometheus
+  grafana_data:  # Definir el volumen persistente para Grafana

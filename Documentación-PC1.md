@@ -2001,135 +2001,143 @@ Se utilizó **GitHub Actions** para automatizar el pipeline de CI/CD del proyect
 
 ### Descripción de cada paso del Pipeline CI/CD
 
-1. **Configuración de Servicios (Base de Datos)**:
-   - **Servicios**: El pipeline inicializa un servicio de PostgreSQL que se ejecuta en un contenedor. Esto asegura que la base de datos esté disponible durante la ejecución de pruebas.
-   - **Verificación de Salud**: Se configuran comandos de `health-check` para asegurar que la base de datos esté lista antes de ejecutar pruebas dependientes de ella.
+El siguiente pipeline ha sido diseñado para automatizar la ejecución de pruebas, generar reportes de cobertura de código y realizar auditorías de seguridad en cada `push` o `pull request` a la rama `main`. A continuación se describe el propósito de cada paso en el archivo `ci.yml`:
 
-   ```yaml
-   services:
-     db:
-       image: postgres:13
-       env:
-         POSTGRES_USER: admin
-         POSTGRES_PASSWORD: secret
-         POSTGRES_DB: dadosdb
-       ports:
-         - 5432:5432
-       options: >-
-         --health-cmd "pg_isready -U admin -d dadosdb" 
-         --health-interval 10s 
-         --health-timeout 5s 
-         --health-retries 10
-   ```
-
-2. **Checkout del Código**:
-   - **Acción**: Se descarga el código desde el repositorio de GitHub. Esto asegura que la última versión del código en `main` esté disponible para las siguientes etapas.
-
+1. **Checkout del Código**:
+   - **Acción**: Se utiliza la acción `actions/checkout@v2` para descargar el código desde el repositorio de GitHub. Esto asegura que la última versión del código en `main` esté disponible para las siguientes etapas.
+   
    ```yaml
    - name: Checkout code
      uses: actions/checkout@v2
    ```
 
-3. **Configuración del Entorno Python**:
-   - **Acción**: Configura el entorno de Python en la versión 3.8. Esto es necesario para que las dependencias se instalen correctamente y las pruebas se ejecuten en el entorno adecuado.
-
+2. **Instalación de Docker Compose**:
+   - **Acción**: Se instala `docker-compose` en el runner de GitHub Actions para manejar la construcción y ejecución de contenedores. Se descarga la última versión disponible desde GitHub.
+   
    ```yaml
-   - name: Set up Python
-     uses: actions/setup-python@v3
-     with:
-       python-version: '3.8'
+   - name: Install Docker Compose
+     run: |
+       sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+       sudo chmod +x /usr/local/bin/docker-compose
+       docker-compose version
    ```
 
-4. **Instalación de Dependencias**:
-   - **Acción**: Se instalan todas las dependencias especificadas en `requirements.txt`. Esto asegura que todas las librerías necesarias para la ejecución de la aplicación estén disponibles en el entorno.
-
+3. **Construcción y Levantamiento de Servicios**:
+   - **Acción**: Se construyen y levantan los servicios definidos en `docker-compose.yml`, incluyendo la aplicación y la base de datos PostgreSQL, en modo desatendido (`-d`).
+   
    ```yaml
-   - name: Install dependencies
+   - name: Build and start services
      run: |
-       python -m pip install --upgrade pip
-       pip install --upgrade setuptools
-       pip install -r requirements.txt
+       docker-compose up -d --build
    ```
 
-5. **Esperar a que la Base de Datos esté lista**:
-   - **Acción**: Verifica que PostgreSQL esté listo antes de ejecutar cualquier prueba que dependa de la base de datos. Esto evita errores en la conexión a la base de datos durante la ejecución de pruebas.
-
+4. **Esperar a que los Servicios Estén Listos**:
+   - **Acción**: Se espera a que los servicios estén listos antes de ejecutar cualquier prueba. Este paso se realiza verificando repetidamente el estado de la aplicación con `curl` en `localhost:8000`.
+   
    ```yaml
-   - name: Wait for PostgreSQL to be ready
+   - name: Wait for services to be ready
      run: |
-       echo "Waiting for PostgreSQL to be ready..."
-       until pg_isready -h localhost -p 5432 -U admin -d dadosdb; do
-         sleep 5
+       echo "Waiting for services to be ready..."
+       for i in {1..30}; do
+         if docker-compose exec app curl -s http://localhost:8000/; then
+           echo "Services are ready!"
+           break
+         else
+           echo "Waiting for services to be ready..."
+           sleep 5
+         fi
        done
-       echo "PostgreSQL is ready!"
+       if [ $i -eq 30 ]; then
+         echo "Application did not start in time"
+         exit 1
+       fi
    ```
 
-6. **Ejecución de Pruebas**:
-   - **Acción**: Ejecuta las pruebas definidas en el directorio `tests/` utilizando `pytest`. Se establece la variable de entorno `DATABASE_URL` para conectar con la base de datos en el contenedor.
-
+5. **Ejecución de Pruebas de Comportamiento con Behave**:
+   - **Acción**: Se ejecutan las pruebas definidas en los archivos `.feature` utilizando `behave`. Estas pruebas verifican el comportamiento general de la aplicación a través de escenarios BDD (Behavior-Driven Development).
+   
    ```yaml
-   - name: Run tests
-     env:
-       DATABASE_URL: postgresql://admin:secret@localhost:5432/dadosdb
-       PYTHONPATH: .
+   - name: Run Behave tests
      run: |
-       pytest tests/
+       docker-compose exec app behave
    ```
 
-7. **Instalación y Ejecución de Auditorías de Seguridad**:
-   - **Acción**: Se instala `pip-audit` y se ejecuta para detectar vulnerabilidades en las dependencias del proyecto.
-
+6. **Ejecución de Pruebas Unitarias y Generación de Reporte de Cobertura**:
+   - **Acción**: Se ejecutan las pruebas unitarias utilizando `pytest` y se genera un reporte de cobertura (`coverage.xml`). Este reporte se utilizará posteriormente para el análisis de cobertura en `SonarCloud`.
+   
    ```yaml
-   - name: Install pip-audit
-     run: pip install pip-audit
+   - name: Run unit tests with coverage
+     run: |
+       docker-compose exec app coverage run -m pytest tests/
+       docker-compose exec app coverage xml -o coverage.xml
+   ```
 
+7. **Copia y Carga del Reporte de Cobertura**:
+   - **Acción**: Se copia el archivo `coverage.xml` generado en el contenedor `app` al host de GitHub Actions. Luego, se sube como un artefacto para su visualización y descarga.
+   
+   ```yaml
+   - name: Copy coverage report to host    
+     run: |
+       docker cp $(docker-compose ps -q app):/app/coverage.xml .  # Copiar el reporte de coverage al host
+
+   - name: Upload coverage report
+     uses: actions/upload-artifact@v3
+     with:
+       name: coverage-report
+       path: coverage.xml
+   ```
+
+8. **Configuración de Java para SonarCloud**:
+   - **Acción**: Se configura el entorno Java 17 en GitHub Actions para asegurar la compatibilidad con `SonarQube`, ya que SonarCloud requiere esta versión para ejecutar su análisis de calidad de código.
+   
+   ```yaml
+   - name: Set up JDK 17
+     uses: actions/setup-java@v2
+     with:
+       distribution: 'adopt'
+       java-version: '17'
+   ```
+
+9. **Análisis de Calidad de Código con SonarCloud**:
+   - **Acción**: Se ejecuta el análisis de calidad de código en SonarCloud para cada `pull request` y `push` a la rama `main`. Se especifican parámetros como `sonar.projectKey`, `sonar.organization`, y el `coverage.xml` generado en pasos anteriores.
+   
+   ```yaml
+   - name: SonarQube Scan
+     if: github.event_name == 'pull_request'   
+     uses: sonarsource/sonarqube-scan-action@v2.1.0
+     env:
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+     with:
+       args: |
+         -Dsonar.projectKey=Renato200419_PC1-CC3S2
+         -Dsonar.organization=renato200419
+         -Dsonar.sources=.
+         -Dsonar.host.url=https://sonarcloud.io
+         -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+         -Dsonar.python.coverage.reportPaths=coverage.xml
+         -Dsonar.java.source=17
+   ```
+
+10. **Auditoría de Dependencias**:
+    - **Acción**: Se instala `pip-audit` y se ejecuta para detectar vulnerabilidades en las dependencias de Python del proyecto.
+   
+   ```yaml
    - name: Audit dependencies
-     run: pip-audit
+     run: |
+       docker-compose exec app pip install pip-audit
+       docker-compose exec app pip-audit
    ```
 
-8. **Construcción de Imagen Docker**:
-   - **Acción**: Construye una imagen Docker para la aplicación usando el `Dockerfile` definido en el proyecto. Esta imagen contiene todo el entorno necesario para ejecutar la aplicación de forma aislada.
+11. **Desmantelamiento de Servicios**:
+    - **Acción**: Se bajan todos los contenedores y se limpian los recursos de Docker para mantener el entorno de GitHub Actions limpio y evitar problemas de espacio o conflictos en futuras ejecuciones.
 
    ```yaml
-   - name: Build Docker image
-     run: docker build -t juego-dados-competitivo .
+   - name: Tear down services
+     run: |
+       docker-compose down
    ```
-
-9. **Creación de Red Docker**:
-   - **Acción**: Se crea una red Docker para conectar la base de datos y la aplicación en un entorno aislado.
-
-   ```yaml
-   - name: Create Docker network
-     run: docker network create juego-dados-network
-   ```
-
-10. **Despliegue en Contenedores**:
-    - **Acción**: Despliega la aplicación en un contenedor Docker y la conecta a la red creada previamente.
-
-    ```yaml
-    - name: Run Docker container
-      run: |
-        docker run -d --network juego-dados-network --name juego-dados -p 8000:8000 juego-dados-competitivo
-    ```
-
-11. **Verificación del Estado de los Contenedores**:
-    - **Acción**: Muestra el estado de todos los contenedores para verificar que todo esté funcionando correctamente.
-
-    ```yaml
-    - name: Verify container status
-      run: docker ps -a
-    ```
-
-12. **Detención y Eliminación de Contenedores y Red**:
-    - **Acción**: Detiene y elimina los contenedores y la red creados para mantener el entorno limpio.
-
-    ```yaml
-    - name: Stop and remove containers and network
-      run: |
-        docker stop juego-dados
-        docker rm juego-dados
-        docker network rm juego-dados-network
-    ```
+---
 
 ## 4.3 Configuración de Análisis de Seguridad y Pruebas Automatizadas
 

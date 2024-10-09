@@ -13,3 +13,5 @@ peewee~=3.17.6
 psycopg2-binary==2.9.6
 
 behave ~=1.2.6
+
+coverage

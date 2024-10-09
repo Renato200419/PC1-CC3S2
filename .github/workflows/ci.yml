@@ -72,22 +72,41 @@ jobs:
           java-version: '17'    
 
       - name: SonarQube Scan
+        # Ejecutar solo si es un Pull Request
+        if: github.event_name == 'pull_request'   
         uses: sonarsource/sonarqube-scan-action@v2.1.0
         env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
-          args: >
+          args: |
             -Dsonar.projectKey=Renato200419_PC1-CC3S2
             -Dsonar.organization=renato200419
             -Dsonar.sources=.
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.python.coverage.reportPaths=coverage.xml
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.python.coverage.reportPaths=coverage.xml
             -Dsonar.java.source=17
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.base=main
+            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
             -Dsonar.pullrequest.branch=${{ github.head_ref }}
+  
+      - name: SonarQube Scan - Main Branch
+        # Ejecutar solo si es un push a la rama main
+        if: github.ref == 'refs/heads/main'  
+        uses: sonarsource/sonarqube-scan-action@v2.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: |
+            -Dsonar.projectKey=Renato200419_PC1-CC3S2
+            -Dsonar.organization=renato200419
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.java.source=17
                 
       - name: Update pip and setuptools
         run: |

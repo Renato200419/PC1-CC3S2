@@ -41,40 +41,48 @@ Este documento incluye un índice detallado que permite navegar por las seccione
 - [1.3 Requisitos](#requisitos)
 
 ## 2. Desarrollo del Proyecto
+
 - [2.1 Estructura y Arquitectura del Proyecto](#21-estructura-y-arquitectura-del-proyecto)
   - [2.1.1 Descripción General de Archivos y Carpetas](#211-descripción-general-de-archivos-y-carpetas)
   - [2.1.2 Funcionalidad y Propósito de Cada Archivo](#212-funcionalidad-y-propósito-de-cada-archivo)
 - [2.2 Estructura de la API REST](#22-estructura-de-la-api-rest)
-  - [2.2.1 Propósito](#propósito)
-  - [2.2.2 Endpoints de la API](#endpoints-de-la-api)
+  - [2.2.1 Propósito](#221-propósito)
+  - [2.2.2 Endpoints de la API](#222-endpoints-de-la-api)
 - [2.3 Explicación de Clases y Almacenamiento de Datos](#23-explicación-de-clases-y-almacenamiento-de-datos)
   - [2.3.1 Clases Definidas en `models.py`](#231-clases-definidas-en-modelspy)
   - [2.3.2 Almacenamiento de Datos](#232-almacenamiento-de-datos)
 - [2.4 Dependencias y Librerías Utilizadas](#24-dependencias-y-librerías-utilizadas)
   - [2.4.1 Librerías y su Propósito](#241-librerías-y-su-propósito)
   - [2.4.2 Cómo se Utilizan en el Proyecto](#242-cómo-se-utilizan-en-el-proyecto)
-- [2.5 Observabilidad y Monitorización](#25-observabilidad-y-monitorización)
-  - [2.5.1 Configuración de Prometheus y Grafana](#251-configuración-de-observabilidad-con-prometheus-y-grafana)
-  - [2.5.2 Métricas Monitoreadas](#252-métricas-monitoreadas)
-  - [2.5.3 Consultas en Grafana](#253-consultas-en-grafana)
-  - [2.5.4 Pasos para Configuración en Grafana y Prometheus](#254-pasos-para-configuración-en-grafana-y-prometheus)
-  - [2.5.5 Finalización con Pull Request y Aceptación de Merge](#255-finalización-con-pull-request-y-aceptación-de-merge)
-  - [2.2.6 Versión final del Dashboard](#256-versión-final-dashboard-grafana)
-- [2.6 Contenerización y Gestión de Servicios](#26-contenerización-y-gestión-de-servicios)
-  - [2.6.1 Estructura de los Servicios](#261-estructura-de-los-servicios)
-  - [2.6.2 Configuración del Dockerfile y Docker Compose](#262-configuración-del-dockerfile-y-docker-compose)
-  - [2.6.3 Ejecución del Proyecto con Docker Compose](#263-ejecución-del-proyecto-con-docker-compose)
-  - [2.6.4 Uso de Volúmenes Persistentes](#264-uso-de-volúmenes-persistentes)
+- [2.5 Pruebas del Proyecto](#25-pruebas-del-proyecto)
+  - [2.5.1 Pruebas Unitarias](#251-pruebas-unitarias)
+  - [2.5.2 Pruebas de Comportamiento con Gherkin y Behave](#252-pruebas-de-comportamiento-con-gherkin-y-behave)
+- [2.6 Observabilidad y Monitorización](#26-observabilidad-y-monitorización)
+  - [2.6.1 Configuración de Observabilidad con Prometheus y Grafana](#261-configuración-de-observabilidad-con-prometheus-y-grafana)
+  - [2.6.2 Métricas Monitoreadas](#262-métricas-monitoreadas)
+  - [2.6.3 Consultas en Grafana](#263-consultas-en-grafana)
+  - [2.6.4 Pasos para Configuración en Grafana y Prometheus](#264-pasos-para-configuración-en-grafana-y-prometheus)
   - [2.6.5 Finalización con Pull Request y Aceptación de Merge](#265-finalización-con-pull-request-y-aceptación-de-merge)
-- [2.7 Cliente de Consola](#27-cliente-de-consola)
-  - [2.7.1 Descripción](#271-descripción-general)
-  - [2.7.2 Funcionalidades](#272-funcionalidades-del-cliente-de-consola)
-- [2.8 Planes para la Versión 2.0.0 del Proyecto](#28-planes-para-la-versión-200-del-proyecto)
-  - [2.8.1 Descripción General](#281-descripción-general)
-  - [2.8.2 Objetivos de la Versión 2.0.0](#282-objetivos-de-la-versión-200)
-  - [2.8.3 Cambios en la Estructura de la Aplicación](#283-cambios-en-la-estructura-de-la-aplicación)
-  - [2.8.4 Retos y Próximos Pasos](#284-retos-y-próximos-pasos)
-  - [2.8.5 Planes Futuros](#28-planes-para-la-versión-200-del-proyecto)
+  - [2.6.6 Versión Final del Dashboard en Grafana](#266-versión-final-del-dashboard-en-grafana)
+- [2.7 Contenerización y Gestión de Servicios](#27-contenerización-y-gestión-de-servicios)
+  - [2.7.1 Estructura de los Servicios](#271-estructura-de-los-servicios)
+  - [2.7.2 Configuración del Dockerfile y Docker Compose](#272-configuración-del-dockerfile-y-docker-compose)
+  - [2.7.3 Ejecución del Proyecto con Docker Compose](#273-ejecución-del-proyecto-con-docker-compose)
+  - [2.7.4 Uso de Volúmenes Persistentes](#274-uso-de-volúmenes-persistentes)
+  - [2.7.5 Finalización con Pull Request y Aceptación de Merge](#275-finalización-con-pull-request-y-aceptación-de-merge)
+- [2.8 Generar Reportes de Cobertura y Calidad de Código](#28-generar-reportes-de-cobertura-y-calidad-de-código)
+  - [2.8.1 Coverage](#281-coverage)
+  - [2.8.2 SonarCloud](#282-sonarcloud)
+- [2.9 Cliente de Consola](#29-cliente-de-consola)
+  - [2.9.1 Descripción General](#291-descripción-general)
+  - [2.9.2 Funcionalidades del Cliente de Consola](#292-funcionalidades-del-cliente-de-consola)
+  - [2.9.3 Estructura de las Funciones](#293-estructura-de-las-funciones)
+  - [2.9.4 Ejemplo de Uso del Cliente de Consola](#294-ejemplo-de-uso-del-cliente-de-consola)
+- [2.10 Planes para la Versión 2.0.0 del Proyecto](#210-planes-para-la-versión-200-del-proyecto)
+  - [2.10.1 Descripción General](#2101-descripción-general)
+  - [2.10.2 Objetivos de la Versión 2.0.0](#2102-objetivos-de-la-versión-200)
+  - [2.10.3 Cambios en la Estructura de la Aplicación](#2103-cambios-en-la-estructura-de-la-aplicación)
+
 ## 3. Gestión del Proyecto con Git
 - [3.1 Flujo de Trabajo con GitHub Flow](#31-flujo-de-trabajo-con-github-flow)
   - [3.1.1 Estructura del Flujo de Trabajo](#311-estructura-del-flujo-de-trabajo)
@@ -455,11 +463,276 @@ Cada librería tiene un rol específico en el proyecto:
 
 ---
 
-## 2.5 Observabilidad y Monitorización
+
+
+## 2.5 Pruebas del Proyecto
+
+### 2.5.1 Pruebas Unitarias
+
+Se implementaron pruebas unitarias en los siguientes módulos:
+
+- `test_app.py`: Pruebas para verificar el comportamiento general de la aplicación y los endpoints.
+- `test_models.py`: Pruebas para validar la integridad y el comportamiento de los modelos `Jugador`, `Partida` y `JugadoresPartidas`.
+- `test_routes.py`: Pruebas para verificar el correcto funcionamiento de las rutas de la API.
+- `test_crud.py`: Pruebas que utilizan mocks para validar las operaciones CRUD realizadas sobre los modelos.
+
+#### 2.5.1.1 Pruebas de la Aplicación
+
+**Archivo**: `tests/test_app.py`
+
+Este archivo contiene pruebas básicas para validar la respuesta del endpoint raíz de la aplicación.
+
+```python
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Bienvenido al Juego de Dados"}
+```
+Detalles adicionales en el archivo: `tests/test_app.py`
+
+#### 2.5.1.2 Pruebas de los Modelos
+
+**Archivo**: `tests/test_models.py`
+
+Este archivo contiene pruebas para validar la creación de instancias de los modelos y las relaciones entre ellas.
+
+```python
+# Prueba para la creación de un jugador
+def test_creacion_jugador():
+    jugador = Jugador.create(nombre="JugadorTest")
+    assert jugador.nombre == "JugadorTest"
+
+# Prueba para asegurar que el nombre del jugador es único
+def test_nombre_jugador_unico():
+    jugador1 = Jugador.create(nombre="JugadorTest")
+    with pytest.raises(IntegrityError):  # Se espera un error de integridad
+        jugador2 = Jugador.create(nombre="JugadorTest")
+```
+Detalles adicionales en el archivo: `tests/test_models.py`
+
+#### 2.5.1.3 Pruebas de Rutas
+
+**Archivo**: `tests/test_routes.py`
+
+Este archivo contiene pruebas para validar el comportamiento de las rutas de la API y su integración con la capa de datos.
+
+```python
+# Prueba para el endpoint raíz '/'
+def test_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Bienvenido al Juego de Dados"}
+
+# Prueba para la ruta de creación de un jugador cuando no existe previamente
+@patch("app.routes.get_jugador_by_name")
+@patch("app.routes.create_jugador")
+def test_create_jugador_route(mock_create_jugador, mock_get_jugador_by_name):
+    mock_get_jugador_by_name.return_value = None
+    mock_create_jugador.return_value = MagicMock(nombre="JugadorAPI")
+
+    response = client.post("/jugadores/", json={"nombre": "JugadorAPI"})
+    assert response.status_code == 201
+    assert response.json() == {"mensaje": "Jugador JugadorAPI registrado con éxito"}
+```
+Detalles adicionales en el archivo: `tests/test_routes.py`
+
+#### 2.5.1.4 Pruebas CRUD
+
+**Archivo**: `tests/test_crud.py`
+
+Este archivo contiene pruebas unitarias con mocks para evitar la dependencia de la base de datos durante la ejecución de las pruebas.
+
+```python
+@patch('app.crud.Jugador')  # Mockear el modelo de Peewee 'Jugador'
+def test_create_jugador(mock_jugador_model):
+    mock_jugador = mock_jugador_model.create.return_value
+    mock_jugador.nombre = "NuevoJugador"
+    jugador = create_jugador("NuevoJugador")
+    mock_jugador_model.create.assert_called_once_with(nombre="NuevoJugador")
+    assert jugador.nombre == "NuevoJugador"
+```
+Detalles adicionales en el archivo: `tests/test_crud.py`
+
+### 2.5.2 Pruebas de Comportamiento con Gherkin y Behave
+
+Para garantizar que la funcionalidad del sistema cumpla con los requisitos definidos, se utilizaron pruebas de comportamiento (`BDD`) con el framework `Behave`. A continuación se describen los principales escenarios de prueba implementados.
+
+#### 2.5.2.1 Registro de Jugadores
+
+**Archivo**: `features/registro_jugador.feature`
+
+Este escenario prueba el registro de jugadores en el sistema. Se implementaron los siguientes pasos:
+
+```gherkin
+Feature: Registro de Jugadores
+  Scenario: Registrar un nuevo jugador
+    Given que no existe un jugador con nombre "Juan"
+    When solicito registrar el jugador "Juan"
+    Then el sistema confirma que el jugador ha sido registrado con éxito
+
+  Scenario: Intentar registrar un jugador ya existente
+    Given que existe un jugador con nombre "Juan"
+    When solicito registrar el jugador "Juan"
+    Then el sistema notifica que el jugador ya está registrado
+```
+
+**Pasos Implementados**:
+
+```python
+@given('que no existe un jugador con nombre "{nombre}"')
+def step_impl(context, nombre):
+    requests.delete(f"{API_URL}/jugadores/{nombre}")
+
+@when('solicito registrar el jugador "{nombre}"')
+def step_impl(context, nombre):
+    context.response = requests.post(f"{API_URL}/jugadores/", json={"nombre": nombre})
+
+@then('el sistema confirma que el jugador ha sido registrado con éxito')
+def step_impl(context):
+    assert context.response.status_code in [200, 201]  # Acepta 200 (OK) y 201 (Created)
+```
+Detalles adicionales en el archivo: `features/steps/registro_jugador_steps.py`
+
+#### 2.5.2.2 Creación de Partidas
+
+**Archivo**: `features/crear_partida.feature`
+
+Este escenario prueba la creación de partidas con diferentes combinaciones de jugadores registrados.
+
+```gherkin
+Feature: Creación de Partidas
+  Scenario: Crear una partida con dos jugadores registrados
+    Given que los jugadores "Ana" y "Luis" están registrados
+    When solicito crear una partida con los jugadores "Ana" y "Luis"
+    Then el sistema crea la partida asignando un ID único
+
+  Scenario: Crear una partida con un solo jugador
+    Given que el jugador "Ana" está registrado
+    When solicito crear una partida con el jugador "Ana"
+    Then el sistema notifica que se requieren al menos 2 jugadores
+```
+
+**Pasos Implementados**:
+
+```python
+@given('que los jugadores "{jugador1}" y "{jugador2}" están registrados')
+def step_impl(context, jugador1, jugador2):
+    for jugador in [jugador1, jugador2]:
+        if not jugador_existe(jugador):
+            requests.post(f"{API_URL}/jugadores/", json={"nombre": jugador})
+
+@then('el sistema crea la partida asignando un ID único')
+def step_impl(context):
+    assert context.response.status_code in [200, 201]
+    data = context.response.json()
+    assert re.search(r"Partida \d+ creada con éxito", data["mensaje"])
+```
+Detalles adicionales en el archivo: `features/steps/crear_partida_steps.py`
+
+#### 2.5.2.3 Lanzamiento de Dados
+
+**Archivo**: `features/lanzar_dados.feature`
+
+Este escenario prueba el funcionamiento de los lanzamientos de dados durante una partida.
+
+```gherkin
+Feature: Lanzamiento de Dados
+  Scenario: Lanzar dados en una partida válida
+    Given que ingreso un ID de partida válido
+    When solicito lanzar los dados
+    Then el sistema genera números aleatorios entre 1 y 6 para cada jugador
+```
+
+**Pasos Implementados**:
+
+```python
+@given('que ingreso un ID de partida válido')
+def step_impl(context):
+    jugadores = ["Ana", "Luis"]
+    for jugador in jugadores:
+        requests.post(f"{API_URL}/jugadores/", json={"nombre": jugador})
+    response = requests.post(f"{API_URL}/partidas/", json=[{"nombre": jugadores[0]}, {"nombre": jugadores[1]}]).json()
+    context.partida_id = re.search(r"Partida (\d+) creada con éxito", response["mensaje"]).group(1)
+
+@then('el sistema genera números aleatorios entre 1 y 6 para cada jugador')
+def step_impl(context):
+    assert context.response.status_code in [200, 201]
+```
+Detalles adicionales en el archivo: `features/steps/lanzar_dados_steps.py`
+
+#### 2.5.2.4 Mostrar Ranking de Jugadores
+
+**Archivo**: `features/mostrar_ranking.feature`
+
+Este escenario prueba la visualización del ranking de jugadores según sus victorias.
+
+```gherkin
+Feature: Mostrar Ranking de Jugadores
+  Scenario: Solicitar el ranking cuando hay jugadores con partidas jugadas
+    Given que hay jugadores registrados con partidas jugadas
+    When solicito ver el ranking
+    Then el sistema muestra una lista ordenada de jugadores por número de victorias
+```
+
+**Pasos Implementados**:
+
+```python
+@given('que hay jugadores registrados con partidas jugadas')
+def step_impl(context):
+    jugadores = [{"nombre": "Ana"}, {"nombre": "Luis"}]
+    for jugador in jugadores:
+        requests.post(f"{API_URL}/jugadores/", json=jugador)
+    response = requests.post(f"{API_URL}/partidas/", json=jugadores).json()
+    context.partida_id = re.search(r"Partida (\d+) creada con éxito", response["mensaje"]).group(1)
+
+@when('solicito ver el ranking')
+def step_impl(context):
+    context.response = requests.get(f"{API_URL}/jugadores/ranking/")
+```
+Detalles adicionales en el archivo: `features/steps/mostrar_ranking_steps.py`
+
+#### 2.5.2.5 Mostrar Estadísticas de Partida
+
+**Archivo**: `features/mostrar_estadisticas.feature`
+
+Este escenario prueba la visualización de estadísticas para una partida existente.
+
+```gherkin
+Feature: Mostrar Estadísticas de Partida
+  Scenario: Solicitar las estadísticas de una partida válida
+    Given que existe una partida con ID guardado
+    When solicito ver las estadísticas de la partida guardada
+    Then el sistema muestra los puntajes actuales de cada jugador en la partida
+```
+
+**Pasos Implementados**:
+
+```python
+@given('que existe una partida con ID guardado')
+def step_impl(context):
+    jugadores = [{"nombre": "Ana"}, {"nombre": "Luis"}]
+    for jugador in jugadores:
+        requests.post(f"{API_URL}/jugadores/", json=jugador)
+    response = requests.post(f"{API_URL}/partidas/", json=jugadores).json()
+    context.partida_id = re.search(r"Partida (\d+) creada con éxito", response["mensaje"]).group(1)
+
+@then('el sistema muestra los puntajes actuales de cada jugador en la partida')
+def step_impl(context):
+    assert context.response.status_code == 200
+```
+Detalles adicionales en el archivo: `features/steps/mostrar_estadisticas_steps.py`
+
+
+## 2.6 Observabilidad y Monitorización
 
 En esta sección se describe cómo se ha configurado y utilizado Prometheus y Grafana para monitorizar el rendimiento y comportamiento de la API del juego de dados. La integración de estas herramientas permite recolectar y visualizar métricas personalizadas, facilitando la identificación de problemas de latencia y el monitoreo de eventos en tiempo real.
 
-### 2.5.1 Configuración de Observabilidad con Prometheus y Grafana
+### 2.6.1 Configuración de Observabilidad con Prometheus y Grafana
 
 #### Introducción
 
@@ -492,7 +765,7 @@ Grafana se utiliza para visualizar las métricas recolectadas por Prometheus. He
   2. Ir a `Dashboards` > `Manage` > `Import`.
   3. Seleccionar el archivo JSON desde `metrics_dashboards/` y seguir las instrucciones para configurar la fuente de datos.
 
-2.5.2 **Métricas Monitoreadas**
+2.6.2 **Métricas Monitoreadas**
 
 Se están monitoreando varias métricas clave del juego de dados y del rendimiento de la API utilizando Prometheus. Cada métrica personalizada se utiliza para monitorear aspectos específicos del juego:
 
@@ -534,7 +807,7 @@ puntuaciones_altas_counter = Counter("puntuaciones_altas", "Total de veces que s
 Estas métricas se utilizan dentro de los endpoints para monitorear en tiempo real el comportamiento de la API y las acciones realizadas por los jugadores.
 
 
-### 2.5.3 Consultas en Grafana
+### 2.6.3 Consultas en Grafana
 
 A continuación se muestran algunas consultas comunes que se pueden utilizar en Grafana para visualizar las métricas recolectadas por Prometheus.
 
@@ -554,7 +827,7 @@ Consulta para ver la latencia promedio de la API:
 rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
 ```
 
-### 2.5.4 Pasos para Configuración en Grafana y Prometheus
+### 2.6.4 Pasos para Configuración en Grafana y Prometheus
 
 1. Luego de usar el comando: `docker-compose up --build -d`, abrimos el enlace: [http://localhost:3000] y nos logeamos como: `admin` tanto en usuario como contraseña.
    ![Descripción de la imagen](Imagenes-obs/Foto1_.png)
@@ -575,7 +848,7 @@ rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
    ![Descripción de la imagen](Imagenes-obs/Foto10.png)
 8. Para finalizar, se importó el dashboard y se agregó a la rama.
 
-### 2.5.5 Finalización con Pull Request y Aceptación de Merge
+### 2.6.5 Finalización con Pull Request y Aceptación de Merge
 
 1. Al subir los cambios en la rama, se hace un `Compare & pull request`.
 2. Se añade un título y una descripción breve.
@@ -584,7 +857,7 @@ rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
 
    ![Descripción de la imagen](Imagenes-obs/Foto11.png)
 
-### 2.5.6 Versión final Dashboard Grafana
+### 2.6.6 Versión final Dashboard Grafana
 
 1. En Grafana configuramos un `data source` nuevo para nuestro **Dashboard final**. Se trata de postgreSQL
 
@@ -600,11 +873,11 @@ rate(latencia_api_sum[1m]) / rate(latencia_api_count[1m])
 
 --- 
 
-## 2.6 Contenerización y Gestión de Servicios
+## 2.7 Contenerización y Gestión de Servicios
 
 En esta sección se describe cómo se ha configurado la contenerización de la aplicación del juego de dados y sus servicios asociados utilizando Docker y Docker Compose, junto con la base de datos PostgreSQL. Se explica cómo se ha construido la imagen de la aplicación, cómo se han orquestado los servicios mediante Docker Compose y cómo se ha integrado PostgreSQL para la persistencia de datos. Además, se detalla la inclusión de servicios adicionales como Prometheus y Grafana para la monitorización y visualización de métricas en tiempo real.
 
-### 2.6.1 Estructura de los Servicios
+### 2.7.1 Estructura de los Servicios
 
 El proyecto contiene los siguientes servicios dentro de contenedores:
 
@@ -613,7 +886,7 @@ El proyecto contiene los siguientes servicios dentro de contenedores:
 - **prometheus**: Contenedor que ejecuta Prometheus para recolectar métricas de la API.
 - **grafana**: Contenedor que ejecuta Grafana para visualizar las métricas recolectadas por Prometheus.
 
-### 2.6.2 Configuración del Dockerfile y Docker Compose
+### 2.7.2 Configuración del Dockerfile y Docker Compose
 
 #### Dockerfile
 
@@ -710,7 +983,7 @@ peewee~=3.17.6
 psycopg2-binary==2.9.6
 ```
 
-### 2.6.3 Ejecución del Proyecto con Docker Compose
+### 2.7.3 Ejecución del Proyecto con Docker Compose
 
 #### Iniciar los Servicios
 
@@ -744,7 +1017,7 @@ Para verificar que todos los contenedores están en ejecución, ejecutar:
 docker ps
 ```
 
-### 2.6.4 Uso de Volúmenes Persistentes
+### 2.7.4 Uso de Volúmenes Persistentes
 
 Para asegurar que los datos de Grafana y Prometheus no se pierdan entre reinicios de contenedores, se configuraron los siguientes volúmenes:
 
@@ -759,7 +1032,7 @@ volumes:
   postgres_data:  # Almacena datos de PostgreSQL
 ```
 
-### 2.6.5 Finalización con Pull Request y Aceptación de Merge
+### 2.7.5 Finalización con Pull Request y Aceptación de Merge
 
 1. Al subir los cambios en la rama, se hace un `Compare & pull request`.
 2. Se añade un título y una descripción breve.
@@ -769,13 +1042,122 @@ volumes:
    ![Descripción de la imagen](Imagenes/Imagen.png)
 
 ---
-## **2.7 Cliente de Consola**
+## 2.8 Generar reportes de cobertura y calidad de código.
+### 2.8.1 Coverage
+Coverage (o cobertura de código) es una métrica que mide qué porcentaje del código fuente ha sido ejecutado durante las pruebas. Ayuda a identificar qué partes del código no están probadas y, por lo tanto, podrían tener errores no detectados. Es comúnmente utilizado para asegurar que las pruebas cubren la mayor parte posible del código, aumentando la fiabilidad y calidad del software.
 
-### **2.7.1 Descripción General**
+#### Integración en CI/CD pipeline
+```yml
+- name: Run unit tests with coverage
+  run: |
+    docker-compose exec app coverage run -m pytest tests/    # Correr los tests con coverage
+    docker-compose exec app coverage xml -o coverage.xml     # Generar el reporte de coverage
+          
+- name: List files in container
+  run: |
+    docker-compose exec app ls -al /  
+
+- name: Copy coverage report to host    
+  run: |
+    docker cp $(docker-compose ps -q app):/app/coverage.xml .    # Copiar el reporte de coverage al host
+
+- name: Upload coverage report
+  uses: actions/upload-artifact@v3
+  with:
+    name: coverage-report
+    path: coverage.xml
+```
+#### Explicación
+1. **`Run unit tests with coverage`**:
+   - Ejecuta las pruebas unitarias con `pytest` y genera el reporte de cobertura (`coverage.xml`) dentro del contenedor `app`.
+
+2. **`List files in container`**:
+   - Lista los archivos y directorios en el contenedor para verificar que `coverage.xml` fue generado correctamente.
+
+3. **`Copy coverage report to host`**:
+   - Copia el archivo `coverage.xml` desde el contenedor `app` al host del runner de GitHub Actions para poder utilizarlo fuera del contenedor.
+
+4. **`Upload coverage report`**:
+   - Sube el archivo `coverage.xml` como un artefacto en GitHub Actions, permitiendo su visualización y descarga desde la interfaz de GitHub.
+
+### 2.8.2 SonarCloud
+SonarCloud es una herramienta de análisis de calidad de código basada en la nube. Evalúa la calidad, seguridad y mantenibilidad del código fuente mediante la detección de bugs, vulnerabilidades y problemas de estilo. Además, ofrece integraciones con herramientas de CI/CD para automatizar el análisis de calidad en cada commit o pull request, facilitando la detección temprana de problemas y asegurando que el código se mantenga en óptimas condiciones.
+
+### En SonarCloud
+
+![Descripción imagen](Imagenes-sonar/Foto1.png)
+
+![Descripción imagen](Imagenes-sonar/Foto2.png)
+
+![Descripción imagen](Imagenes-sonar/Foto3.png)
+
+#### Integración en CI/CD pipeline
+```yml
+- name: Set up JDK 17  # Configurar Java 17 para la compatibilidad con SonarQube
+  uses: actions/setup-java@v2
+  with:
+    distribution: 'adopt'
+    java-version: '17'    
+
+- name: SonarQube Scan
+  # Ejecutar solo si es un Pull Request
+  if: github.event_name == 'pull_request'   
+  uses: sonarsource/sonarqube-scan-action@v2.1.0
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: |
+       -Dsonar.projectKey=Renato200419_PC1-CC3S2
+       -Dsonar.organization=renato200419
+       -Dsonar.sources=.
+       -Dsonar.host.url=https://sonarcloud.io
+       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+       -Dsonar.python.coverage.reportPaths=coverage.xml
+       -Dsonar.java.source=17
+       -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+       -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
+       -Dsonar.pullrequest.branch=${{ github.head_ref }}
+  
+- name: SonarQube Scan - Main Branch
+  # Ejecutar solo si es un push a la rama main
+  if: github.ref == 'refs/heads/main'  
+  uses: sonarsource/sonarqube-scan-action@v2.1.0
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: |
+       -Dsonar.projectKey=Renato200419_PC1-CC3S2
+       -Dsonar.organization=renato200419
+       -Dsonar.sources=.
+       -Dsonar.host.url=https://sonarcloud.io
+       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+       -Dsonar.python.coverage.reportPaths=coverage.xml
+       -Dsonar.java.source=17
+```
+#### Explicación Breve de Cada Paso
+
+1. **`Set up JDK 17`**:
+   - **Propósito**: Configura Java 17 en el entorno de GitHub Actions para garantizar la compatibilidad con SonarQube.
+   - **Descripción**: Utiliza la acción `setup-java@v2` para instalar la versión 17 de Java (`adopt` es el distribuidor). Esto es necesario porque SonarQube requiere Java para ejecutar su análisis.
+
+2. **`SonarQube Scan` (Pull Request)**:
+   - **Propósito**: Realiza el análisis de SonarQube solo si la ejecución se activa por un Pull Request (`if: github.event_name == 'pull_request'`).
+   - **Descripción**: Usa la acción `sonarsource/sonarqube-scan-action` para ejecutar el análisis en SonarCloud. Se pasan parámetros específicos como `sonar.projectKey`, `sonar.organization`, y las variables del Pull Request (`sonar.pullrequest.key`, `sonar.pullrequest.base`, y `sonar.pullrequest.branch`).
+
+3. **`SonarQube Scan - Main Branch`**:
+   - **Propósito**: Ejecuta el análisis de SonarQube en la rama `main` después de un push (`if: github.ref == 'refs/heads/main'`).
+   - **Descripción**: Similar al paso anterior, pero sin las variables de Pull Request. Esto asegura que SonarCloud realice un análisis estándar en la rama `main`, midiendo cobertura y verificando calidad.
+---
+
+## **2.9 Cliente de Consola**
+
+### **2.9.1 Descripción General**
 
 El cliente de consola permite a los usuarios interactuar con el juego de dados a través de comandos de texto. Utiliza la API para registrar jugadores, crear partidas, lanzar dados, consultar estadísticas de las partidas y visualizar el ranking de jugadores. La interfaz ha sido diseñada para ser intuitiva y proporcionar una experiencia agradable mediante el uso de colores.
 
-### **2.7.2 Funcionalidades del Cliente de Consola**
+### **2.9.2 Funcionalidades del Cliente de Consola**
 
 1. **Registrar Jugador**
     - El usuario ingresa el nombre del jugador y el cliente realiza una solicitud `POST` a la ruta `/jugadores/` de la API para registrar al jugador en el sistema.
@@ -804,7 +1186,7 @@ El cliente de consola permite a los usuarios interactuar con el juego de dados a
 6. **Salir**
     - Permite al usuario salir del juego y finalizar la ejecución del cliente de consola.
 
-### **2.7.3 Estructura de las Funciones**
+### **2.9.3 Estructura de las Funciones**
 
 A continuación se describen las principales funciones implementadas en el cliente de consola:
 
@@ -822,7 +1204,7 @@ A continuación se describen las principales funciones implementadas en el clien
 
 - **`menu_principal()`**: Muestra el menú principal del juego con las opciones disponibles y gestiona la navegación entre las funciones del cliente.
 
-### **2.7.4 Ejemplo de Uso del Cliente de Consola**
+### **2.9.4 Ejemplo de Uso del Cliente de Consola**
 
 A continuación se muestra un ejemplo de uso del cliente de consola:
 
@@ -845,13 +1227,13 @@ Puntuaciones: {'Juan': 50, 'Ana': 30}
 ```
 
 ---
-### **2.8 Planes para la Versión 2.0.0 del Proyecto**
+### **2.10 Planes para la Versión 2.0.0 del Proyecto**
 
-#### **2.8.1 Descripción General**
+#### **2.10.1 Descripción General**
 
 La versión 2.0.0 del proyecto de juego de dados competitivo se centra en la transición de la aplicación a un sistema cliente-servidor para permitir una experiencia multijugador real. Esta nueva versión se diseñará para ofrecer una mayor independencia a cada jugador durante el transcurso de las partidas, así como mejorar la gestión de partidas y la interactividad del juego.
 
-#### **2.8.2 Objetivos de la Versión 2.0.0**
+#### **2.10.2 Objetivos de la Versión 2.0.0**
 
 1. **Implementar la Consola de Jugadores:**
    - En esta versión, se separará la consola de administración actual (`game_console.py`) de la consola de jugadores, creando una nueva consola destinada exclusivamente a las interacciones de los jugadores.
@@ -874,7 +1256,7 @@ La versión 2.0.0 del proyecto de juego de dados competitivo se centra en la tra
      - *Número de jugadores activos en salas.*
      - *Cantidad de partidas finalizadas exitosamente.*
 
-#### **2.8.3 Cambios en la Estructura de la Aplicación**
+#### **2.10.3 Cambios en la Estructura de la Aplicación**
 
 - **Endpoints y Funcionalidades:**
   - Los endpoints de la API se mantendrán, pero se realizarán ajustes para soportar la nueva estructura de salas y turnos. Se espera añadir rutas adicionales para gestionar la creación y eliminación de salas, así como la administración de los turnos de cada jugador.

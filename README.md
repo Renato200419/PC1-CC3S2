@@ -2,7 +2,7 @@
 
 ## Descripción del Proyecto
 
-El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que permite a los jugadores competir en partidas lanzando dados y acumulando puntos. Los jugadores pueden unirse a salas, participar en partidas y ver su posición en el ranking en tiempo real. La aplicación se ejecuta en un entorno contenerizado con Docker y utiliza Prometheus y Grafana para monitorear métricas del juego. Además, el proyecto sigue un flujo DevSecOps que automatiza las pruebas, auditorías de seguridad y despliegues con GitHub Actions.
+El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que permite a los jugadores competir en partidas lanzando dados y acumulando puntos. Los jugadores pueden unirse a partidas y ver su posición en el ranking en tiempo real. La aplicación se ejecuta en un entorno contenerizado con Docker y utiliza Prometheus y Grafana para monitorear métricas del juego. Además, el proyecto sigue un flujo DevSecOps que automatiza las pruebas, auditorías de seguridad y despliegues con GitHub Actions.
 
 ## Características Principales
 
@@ -16,6 +16,7 @@ El **Juego de Dados Competitivo** es una aplicación desarrollada en Python que 
 ### Requisitos Previos
 
 - Docker y Docker Compose instalados en el sistema.
+- Python 3.8 o superior instalado en el sistema para ejecutar la consola del juego.
 
 ### Instalación
 

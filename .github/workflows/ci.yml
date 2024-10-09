@@ -57,7 +57,7 @@ jobs:
           docker cp $(docker-compose ps -q app):/coverage.xml .    # Copiar el reporte de coverage al host
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: coverage.xml

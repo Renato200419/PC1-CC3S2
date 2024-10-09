@@ -51,10 +51,14 @@ jobs:
         run: |
           docker-compose exec app coverage run -m pytest tests/    # Correr los tests con coverage
           docker-compose exec app coverage xml -o coverage.xml     # Generar el reporte de coverage
-      
+
+      - name: List files in container
+        run: |
+          docker-compose exec app ls -al /    
+          
       - name: Copy coverage report to host    
         run: |
-          docker cp $(docker-compose ps -q app):/coverage.xml .    # Copiar el reporte de coverage al host
+          docker cp $(docker-compose ps -q app):/app/coverage.xml .    # Copiar el reporte de coverage al host
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3

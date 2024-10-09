@@ -47,10 +47,48 @@ jobs:
         run: |
           docker-compose exec app behave
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         run: |
-          docker-compose exec app pytest tests/
+          docker-compose exec app coverage run -m pytest tests/    # Correr los tests con coverage
+          docker-compose exec app coverage xml -o coverage.xml     # Generar el reporte de coverage
           
+      - name: List files in container
+        run: |
+          docker-compose exec app ls -al /    
+      - name: Copy coverage report to host    
+        run: |
+          docker cp $(docker-compose ps -q app):/app/coverage.xml .    # Copiar el reporte de coverage al host
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+      - name: Set up JDK 17  # Configurar Java 17 para la compatibilidad con SonarQube
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'    
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2.1.0
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=Renato200419_PC1-CC3S2
+            -Dsonar.organization=renato200419
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.java.source=17
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.base=main
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+                
       - name: Update pip and setuptools
         run: |
           docker-compose exec app pip install --upgrade pip setuptools
